@@ -13,7 +13,7 @@ public class StoreAgent extends Agent {
     private int stock;
     private int sale;
     private float price;
-    private float finalPrice;
+
 
     
 }
