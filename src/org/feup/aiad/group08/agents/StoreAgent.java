@@ -14,6 +14,19 @@ public class StoreAgent extends Agent {
     private int sale;
     private float price;
 
+    public float getBalance() {
+        return balanceAvailable;
+    }
+
+    public float checkStock(){
+        //if (stock == 0) {   
+        //}
+        return stock;
+    }
+    
+    public float getFinalPrice(){
+        return (price - (price*sale));
+    } 
 
     
 }
