@@ -98,3 +98,7 @@ hs_err_pid*
 .vscode/
 *.xml
 *.iml
+
+# Jade
+APDescription.txt
+MTPs-Main-Container.txt
