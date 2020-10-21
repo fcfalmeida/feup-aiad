@@ -1,28 +1,25 @@
 import jade.core.Agent;
-import jade.behaviours.Behaviour;
+import jade.core.behaviours.Behaviour;
 import java.util.Vector;
 
-public class CustomerAgent implements Agent{
+public class CustomerAgent extends Agent {
 
-    private String name;
-    private float wallet;
+    private static final long serialVersionUID = -8345978142167560058L;
+
+    private float balance;
+    private float influentiability;
     private Vector<String> storePreferences;
 
-    public CustomerAgent(String name, float wallet, Vector<String> storePreferences){
-        this.name = name;
-        this.wallet = wallet;
+    public CustomerAgent(float initBalance, Vector<String> storePreferences) {
+        balance = initBalance;
         this.storePreferences = storePreferences;
     }
 
-    public String getName() {
-        return this.name;
+    public float getBalance() {
+        return balance;
     }
 
-    public float getWallet() {
-        return this.wallet;
-    }
-
-    public Vector<String> getStorePreferences {
-        return this.storePreferences;
+    public Vector<String> getStorePreferences() {
+        return storePreferences;
     }
 }
