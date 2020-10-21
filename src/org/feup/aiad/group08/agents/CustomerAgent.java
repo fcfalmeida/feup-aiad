@@ -1,3 +1,5 @@
+package org.feup.aiad.group08.agents;
+
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import java.util.Vector;
