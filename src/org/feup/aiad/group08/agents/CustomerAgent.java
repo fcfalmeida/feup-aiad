@@ -22,6 +22,14 @@ public class CustomerAgent extends Agent {
         
     }
 
+    public CustomerAgent(){
+        balance = 100;
+        storePreferences = new Vector<String>(2);
+        storePreferences.add("Tech");
+        storePreferences.add("Food");
+        influenceability = generateInfluenceability();
+    }
+
     public float getBalance() {
         return balance;
     }
@@ -34,7 +42,7 @@ public class CustomerAgent extends Agent {
         return influenceability;
     }
         
-    private double generateInfluenceability(){
-        return new Random().nextGaussian() * INFLUENCE_UPPER_LIMIT + INFLUENCE_LOWER_LIMIT;
+    private static double generateInfluenceability(){
+        return new Random().nextInt(INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT + 1) + INFLUENCE_LOWER_LIMIT;
     }
 }
