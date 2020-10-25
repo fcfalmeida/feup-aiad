@@ -1,12 +1,13 @@
-package org.feup.aiad.group08.agents;
+package org.feup.aiad.group08.definitions;
 
-public enum ServiceType {
+public enum SystemRole {
     STORE("store"),
-    CUSTOMER("customer");
+    CUSTOMER("customer"),
+    MANAGER("manager");
     
     private final String type;
 
-    ServiceType(final String type) {
+    SystemRole(final String type) {
         this.type = type;
     }
 
