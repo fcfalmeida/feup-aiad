@@ -2,6 +2,7 @@ package org.feup.aiad.group08;
 
 import org.feup.aiad.group08.agents.ManagerAgent;
 import org.feup.aiad.group08.agents.StoreAgent;
+import org.feup.aiad.group08.agents.WarehouseAgent;
 import org.feup.aiad.group08.utils.Utils;
 
 import jade.core.Profile;
@@ -22,12 +23,19 @@ public class Main {
         p = new ProfileImpl();
         container = rt.createAgentContainer(p);
 
-        createStores();
+        createWarehouse();
+        // Wait for warehouse to register in the DF
+        Utils.sleep(500);
 
+        createStores();
         // Wait for stores to register in the DF
         Utils.sleep(500);
 
         createManager();
+    }
+
+    private static void createWarehouse() throws StaleProxyException {
+        container.acceptNewAgent("warehouse", new WarehouseAgent()).start();;
     }
 
     private static void createStores() throws StaleProxyException {

@@ -9,8 +9,13 @@ import org.feup.aiad.group08.definitions.SystemPhase;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPAAgentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
+import jade.proto.AchieveREResponder;
 
 public class ManagerAgent extends DFUserAgent {
 
@@ -23,14 +28,16 @@ public class ManagerAgent extends DFUserAgent {
 
     public ManagerAgent(int salesPhaseDuration) {
         this.salesPhaseDuration = salesPhaseDuration;
+
+        addSystemRole(SystemRole.MANAGER);
     }
 
     @Override
     protected void setup() {
+        super.setup();
+
         addBehaviour(new PhaseControlBehaviour(this, 1000));
-
-        System.out.println("ManagerAgent Started");
-
+        
         startRestockPhase();
     }
 
@@ -52,9 +59,11 @@ public class ManagerAgent extends DFUserAgent {
         System.out.println("RESTOCK PHASE");
 
         List<AID> stores = search(SystemRole.STORE);
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setContent(MessageType.AUTHORIZE_STOCK_PURCHASE.toString());
-        
+
+        System.out.println("Stores found: " + stores.size());
+
         for (AID store : stores)
             msg.addReceiver(store);
 
@@ -69,7 +78,7 @@ public class ManagerAgent extends DFUserAgent {
         // TODO: notify all CustomerAgent that they can begin shopping
     }
 
-    class PhaseControlBehaviour extends TickerBehaviour {
+    private class PhaseControlBehaviour extends TickerBehaviour {
 
         private static final long serialVersionUID = 1L;
 
@@ -89,7 +98,7 @@ public class ManagerAgent extends DFUserAgent {
         }
     }
 
-    class AuthorizeStockPurchaseBehaviour extends AchieveREInitiator {
+    private class AuthorizeStockPurchaseBehaviour extends AchieveREInitiator {
 
         private static final long serialVersionUID = -5814692859721095838L;
 
@@ -99,7 +108,34 @@ public class ManagerAgent extends DFUserAgent {
 
         @Override
         protected void handleInform(ACLMessage inform) {
-            System.out.println("Store " + inform.getSender() + " will purchase stock");
+            System.out.println("Store " + inform.getSender().getName() + " will purchase stock");
+
+            addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(getAgent(),
+                    MessageTemplate.MatchContent(MessageType.CONFIRM_STOCK_PURCHASE.toString())));
+        }
+    }
+
+    private class ReceiveStockPurchaseConfirmationBehaviour extends AchieveREResponder {
+
+        private static final long serialVersionUID = 7438211244918027385L;
+
+        public ReceiveStockPurchaseConfirmationBehaviour(Agent a, MessageTemplate mt) {
+            super(a, mt);
+        }
+
+        @Override
+        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
+            return null;
+        }
+
+        @Override
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+            System.out.println("Manager received stock purchase confirmation from store " + request.getSender().getName());
+            ACLMessage res = request.createReply();
+            res.setPerformative(ACLMessage.INFORM);
+
+            return res;
         }
     }
 }
