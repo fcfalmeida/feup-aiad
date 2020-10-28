@@ -103,8 +103,5 @@ hs_err_pid*
 APDescription.txt
 MTPs-Main-Container.txt
 
-# Lib sources
-lib/sources/
-
 # MacOS
 .DS_Store
