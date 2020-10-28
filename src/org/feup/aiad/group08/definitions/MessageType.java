@@ -29,4 +29,12 @@ public enum MessageType {
     public String toString() {
         return type;
     }
+
+    public static MessageType fromString(String text) {
+        for (MessageType mt : MessageType.values()) {
+            if (mt.type.equalsIgnoreCase(text))
+                return mt;
+        }
+        return null;
+    }
 }

@@ -3,6 +3,7 @@ package org.feup.aiad.group08.agents;
 import java.util.List;
 
 import org.feup.aiad.group08.definitions.SystemRole;
+import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemPhase;
 
@@ -59,13 +60,9 @@ public class ManagerAgent extends DFUserAgent {
         System.out.println("RESTOCK PHASE");
 
         List<AID> stores = search(SystemRole.STORE);
-        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-        msg.setContent(MessageType.AUTHORIZE_STOCK_PURCHASE.toString());
+        ACLMessage msg = MessageFactory.authorizeStockPurchase(stores.toArray(new AID[0]));
 
         System.out.println("Stores found: " + stores.size());
-
-        for (AID store : stores)
-            msg.addReceiver(store);
 
         addBehaviour(new AuthorizeStockPurchaseBehaviour(this, msg));
     }
@@ -111,7 +108,7 @@ public class ManagerAgent extends DFUserAgent {
             System.out.println("Store " + inform.getSender().getName() + " will purchase stock");
 
             addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(getAgent(),
-                    MessageTemplate.MatchContent(MessageType.CONFIRM_STOCK_PURCHASE.toString())));
+                    MessageTemplate.MatchConversationId(MessageType.CONFIRM_STOCK_PURCHASE.toString())));
         }
     }
 
@@ -132,10 +129,8 @@ public class ManagerAgent extends DFUserAgent {
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
             System.out.println("Manager received stock purchase confirmation from store " + request.getSender().getName());
-            ACLMessage res = request.createReply();
-            res.setPerformative(ACLMessage.INFORM);
 
-            return res;
+            return MessageFactory.confirmStockPurchaseReply(request);
         }
     }
 }

@@ -9,9 +9,11 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
+import jade.tools.sniffer.Message;
 
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemRole;
+import org.feup.aiad.group08.messages.MessageFactory;
 
 public class StoreAgent extends DFUserAgent {
 
@@ -30,7 +32,7 @@ public class StoreAgent extends DFUserAgent {
         super.setup();
 
         addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this, 
-            MessageTemplate.MatchContent(MessageType.AUTHORIZE_STOCK_PURCHASE.toString())));
+            MessageTemplate.MatchConversationId(MessageType.AUTHORIZE_STOCK_PURCHASE.toString())));
     }
 
     public float getBalance() {
@@ -63,11 +65,10 @@ public class StoreAgent extends DFUserAgent {
         @Override
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException {
             System.out.println("Store " + getAID().getName() + " received stock purchase authorization from Manager");
+
             AID warehouse = searchOne(SystemRole.WAREHOUSE);
 
-            ACLMessage stockPurchaseMsg = new ACLMessage(ACLMessage.REQUEST);
-            stockPurchaseMsg.setContent(MessageType.PURCHASE_STOCK.toString());
-            stockPurchaseMsg.addReceiver(warehouse);
+            ACLMessage stockPurchaseMsg = MessageFactory.purchaseStock(warehouse);
 
             addBehaviour(new PurchaseStockBehaviour(getAgent(), stockPurchaseMsg));
 
@@ -90,12 +91,11 @@ public class StoreAgent extends DFUserAgent {
         @Override
         protected void handleInform(ACLMessage inform) {
             System.out.println("Store " + getAID().getName() + " received stock purchase confirmation from Warehouse");
+
             // Stock purchase done
             // Tell the manager that this store is done purchasing stock
             AID manager = searchOne(SystemRole.MANAGER);
-            ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-            msg.setContent(MessageType.CONFIRM_STOCK_PURCHASE.toString());
-            msg.addReceiver(manager);
+            ACLMessage msg = MessageFactory.confirmStockPurchase(manager);
 
             addBehaviour(new SendStockPurchaseConfirmationBehaviour(getAgent(), msg));
         }

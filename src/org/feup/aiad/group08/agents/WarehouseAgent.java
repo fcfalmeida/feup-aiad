@@ -2,6 +2,7 @@ package org.feup.aiad.group08.agents;
 
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemRole;
+import org.feup.aiad.group08.messages.MessageFactory;
 
 import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -24,7 +25,7 @@ public class WarehouseAgent extends DFUserAgent {
         super.setup();
 
         addBehaviour(new ReceiveStockPurchaseRequestBehaviour(this,
-                MessageTemplate.MatchContent(MessageType.PURCHASE_STOCK.toString())));
+                MessageTemplate.MatchConversationId(MessageType.PURCHASE_STOCK.toString())));
     }
 
     private class ReceiveStockPurchaseRequestBehaviour extends AchieveREResponder {
@@ -43,14 +44,9 @@ public class WarehouseAgent extends DFUserAgent {
         @Override
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
-            ACLMessage res = request.createReply();
-            res.setPerformative(ACLMessage.INFORM);
+            ACLMessage res = MessageFactory.purchaseStockReply(request);
 
             System.out.println("Warehouse Received stock purchase request from " + request.getSender().getName());
-
-            // Waits for another stock purchase
-            addBehaviour(new ReceiveStockPurchaseRequestBehaviour(getAgent(),
-                    MessageTemplate.MatchContent(MessageType.PURCHASE_STOCK.toString())));
 
             return res;
         }
