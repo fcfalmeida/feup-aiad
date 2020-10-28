@@ -9,6 +9,7 @@ import jade.proto.AchieveREInitiator;
 import java.util.Vector;
 
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 
 public class CustomerAgent extends DFUserAgent {
@@ -73,8 +74,8 @@ public class CustomerAgent extends DFUserAgent {
             
             /**
              * Item purchase is done
-             */
-           
-
+             */  
+        }    
     }
 }
+
