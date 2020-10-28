@@ -11,10 +11,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
-import jade.tools.sniffer.Message;
 
 import org.feup.aiad.group08.definitions.MessageType;
-import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 
@@ -147,6 +145,6 @@ public class StoreAgent extends DFUserAgent {
                     MessageTemplate.MatchContent(MessageType.PURCHASE_ITEM.toString())));
 
             return res;
-        
+        }
     }
 }
