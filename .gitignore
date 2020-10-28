@@ -83,7 +83,6 @@ fabric.properties
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -102,9 +101,6 @@ hs_err_pid*
 # Jade
 APDescription.txt
 MTPs-Main-Container.txt
-
-# Lib sources
-lib/sources/
 
 # MacOS
 .DS_Store
