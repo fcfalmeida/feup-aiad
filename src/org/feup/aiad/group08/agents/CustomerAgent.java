@@ -1,6 +1,8 @@
 package org.feup.aiad.group08.agents;
 
 import java.util.Random;
+
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -9,6 +11,7 @@ import jade.proto.AchieveREInitiator;
 import java.util.Vector;
 
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 
 public class CustomerAgent extends DFUserAgent {
@@ -70,11 +73,7 @@ public class CustomerAgent extends DFUserAgent {
         @Override
         protected void handleInform(ACLMessage inform) {
             System.out.println("Store " + getAID().getName() + " received item purchase confirmation from Store");
-            
-            /**
-             * Item purchase is done
-             */
-           
-
+            // The item is successfully purchased from the store.
+        }
     }
 }

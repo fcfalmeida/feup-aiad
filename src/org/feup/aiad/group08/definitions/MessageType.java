@@ -12,12 +12,7 @@ public enum MessageType {
     // Sent by ManagerAgent to allow CustomerAgent to purchase item
     AUTHORIZE_ITEM_PURCHASE("authorize-item-purchase"),
     // Sent by CustomerAgent to StoreAgent to request item purchase
-    PURCHASE_ITEM("purchase-item"),
-    // Sent by StoreAgent to ManagerAgent when it finishes purchasing stock
-    CONFIRM_ITEM_PURCHASE("confirm-item-purchase");
-
-
-    
+    PURCHASE_ITEM("purchase-item");
     
     private final String type;
 

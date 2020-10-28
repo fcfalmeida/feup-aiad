@@ -1,5 +1,7 @@
 package org.feup.aiad.group08.agents;
 
+import java.util.Random;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -12,6 +14,7 @@ import jade.proto.AchieveREResponder;
 import jade.tools.sniffer.Message;
 
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 
@@ -38,6 +41,14 @@ public class StoreAgent extends DFUserAgent {
     public float getBalance() {
         return balanceAvailable;
     }
+
+    //
+    public int getStock(){
+        Random rand = new Random(); 
+        int numberRequestStock = rand.nextInt(51);
+        return numberRequestStock;
+    }
+    //
 
     public float checkStock() {
         // if (stock == 0) {
@@ -108,5 +119,34 @@ public class StoreAgent extends DFUserAgent {
         public SendStockPurchaseConfirmationBehaviour(Agent a, ACLMessage msg) {
             super(a, msg);
         }
+    }
+
+    private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder{
+
+        private static final long serialVersionUID = 1L;
+
+        public ReceiveItemPurchaseRequestBehaviour(Agent a, MessageTemplate mt) {
+            super(a, mt);
+        }
+
+        @Override
+        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
+            return null;
+        }
+
+        @Override
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+            ACLMessage res = request.createReply();
+            res.setPerformative(ACLMessage.INFORM);
+
+            System.out.println("Store received item purchase request from " + request.getSender().getName());
+
+            // Waits for another item purchase from other agents
+            addBehaviour(new ReceiveItemPurchaseRequestBehaviour(getAgent(),
+                    MessageTemplate.MatchContent(MessageType.PURCHASE_ITEM.toString())));
+
+            return res;
+        
     }
 }
