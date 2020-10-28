@@ -16,10 +16,10 @@ public class DFUserAgent extends Agent {
 
     private static final long serialVersionUID = -3233593926341881240L;
 
-    private List<SystemRole> SystemRoles = new ArrayList<>();
+    private List<SystemRole> systemRoles = new ArrayList<>();
 
     protected void addSystemRole(SystemRole SystemRole) {
-        SystemRoles.add(SystemRole);
+        systemRoles.add(SystemRole);
     }
     
     @Override
@@ -27,7 +27,7 @@ public class DFUserAgent extends Agent {
         DFAgentDescription ad = new DFAgentDescription();
         ad.setName(getAID());
 
-        for (SystemRole st : SystemRoles) {
+        for (SystemRole st : systemRoles) {
             ServiceDescription sd = new ServiceDescription();
             sd.setType(st.toString());
             sd.setName(getLocalName());
@@ -85,21 +85,8 @@ public class DFUserAgent extends Agent {
      * @return the agent's AID or null if it couldn't be found
      */
     protected AID searchOne(SystemRole... systemRoles) {
-        DFAgentDescription template = new DFAgentDescription();
-        
-        for (SystemRole sr : systemRoles) {
-            ServiceDescription sd = new ServiceDescription();
-            sd.setType(sr.toString());
-            template.addServices(sd);
+        List<AID> result = search(systemRoles);
 
-            try {
-                DFAgentDescription[] result = DFService.search(this, template);
-                return result[0].getName();
-            } catch (FIPAException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
+        return result.get(0);
     }
 }
