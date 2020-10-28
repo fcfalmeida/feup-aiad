@@ -7,7 +7,17 @@ public enum MessageType {
     // Sent by StoreAgent to WarehouseAgent to request stock purchase
     PURCHASE_STOCK("purchase-stock"),
     // Sent by StoreAgent to ManagerAgent when it finishes purchasing stock
-    CONFIRM_STOCK_PURCHASE("confirm-stock-purchase");
+    CONFIRM_STOCK_PURCHASE("confirm-stock-purchase"),
+
+    // Sent by ManagerAgent to allow CustomerAgent to purchase item
+    AUTHORIZE_ITEM_PURCHASE("authorize-item-purchase"),
+    // Sent by CustomerAgent to StoreAgent to request item purchase
+    PURCHASE_ITEM("purchase-item"),
+    // Sent by StoreAgent to ManagerAgent when it finishes purchasing stock
+    CONFIRM_ITEM_PURCHASE("confirm-item-purchase");
+
+
+    
     
     private final String type;
 
