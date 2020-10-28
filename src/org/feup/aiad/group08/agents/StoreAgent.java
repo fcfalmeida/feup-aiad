@@ -11,6 +11,7 @@ import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 
 public class StoreAgent extends DFUserAgent {
