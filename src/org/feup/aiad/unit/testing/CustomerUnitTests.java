@@ -2,11 +2,8 @@ package org.feup.aiad.unit.testing;
 
 import org.junit.jupiter.api.Test;
 
-import jade.wrapper.StaleProxyException;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Vector;
 import org.feup.aiad.group08.agents.CustomerAgent;
 
 public class CustomerUnitTests {
