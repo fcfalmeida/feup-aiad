@@ -109,4 +109,33 @@ public class StoreAgent extends DFUserAgent {
             super(a, msg);
         }
     }
+
+    private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder{
+
+        private static final long serialVersionUID = 1L;
+
+        public ReceiveItemPurchaseRequestBehaviour(Agent a, MessageTemplate mt) {
+            super(a, mt);
+        }
+
+        @Override
+        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
+            return null;
+        }
+
+        @Override
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+            ACLMessage res = request.createReply();
+            res.setPerformative(ACLMessage.INFORM);
+
+            System.out.println("Store received item purchase request from " + request.getSender().getName());
+
+            // Waits for another item purchase from other agents
+            addBehaviour(new ReceiveItemPurchaseRequestBehaviour(getAgent(),
+                    MessageTemplate.MatchContent(MessageType.PURCHASE_ITEM.toString())));
+
+            return res;
+        
+    }
 }
