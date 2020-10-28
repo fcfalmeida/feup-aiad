@@ -1,5 +1,7 @@
 package org.feup.aiad.group08.agents;
 
+import java.util.Random;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -37,6 +39,14 @@ public class StoreAgent extends DFUserAgent {
     public float getBalance() {
         return balanceAvailable;
     }
+
+    //
+    public int getStock(){
+        Random rand = new Random(); 
+        int numberRequestStock = rand.nextInt(51);
+        return numberRequestStock;
+    }
+    //
 
     public float checkStock() {
         // if (stock == 0) {
