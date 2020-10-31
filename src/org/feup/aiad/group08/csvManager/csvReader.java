@@ -1,26 +1,28 @@
 package org.feup.aiad.group08.csvManager;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Arrays;
 
-public class csvReader {
+public class CSVReader {
 
-    private static String fileToReadName;
-    private static String delimiter;
+    private String fileToReadName;
+    private  String delimiter;
     private List<List<String>> data;
 
     /**
-     * This constructor reads every line of the csv and stores the values of the line in a list.
-     * Each line represented by a list is added to the data list
-     * @param fileToReadName - Name of the csv file that is going to be read, e.g. "customers.csv"
-     * @param delimiter - Character or string that delimits each value in the lines of the csv
+     * This constructor reads every line of the csv and stores the values of the
+     * line in a list. Each line represented by a list is added to the data list
+     * The class was mode for reading customer and store information from a csv file
+     * @param fileToReadName - Name of the csv file that is going to be read, e.g.
+     *                       "customers.csv"
+     * @param delimiter      - Character or string that delimits each value in the
+     *                       lines of the csv
      * @throws IOException
      */
-    public csvReader(String fileToReadName, String delimiter) throws IOException{
+    public CSVReader(String fileToReadName, String delimiter) throws IOException {
 
         this.fileToReadName = fileToReadName;
         this.delimiter = delimiter;
