@@ -28,11 +28,12 @@ public class CSVReader {
         this.delimiter = delimiter;
 
         try ( BufferedReader buffReader = new BufferedReader( new FileReader(fileToReadName))) {
+
             String line;
             while (( line = buffReader.readLine()) != null) {
                 String[] lineValues = line.split(delimiter);
                 data.add(Arrays.asList(lineValues));
-            }
+            }            
         }
     }
 
