@@ -35,7 +35,7 @@ public class Main {
     }
 
     private static void createWarehouse() throws StaleProxyException {
-        container.acceptNewAgent("warehouse", new WarehouseAgent()).start();;
+        container.acceptNewAgent("warehouse", new WarehouseAgent()).start();
     }
 
     private static void createStores() throws StaleProxyException {

@@ -76,4 +76,24 @@ public class CustomerAgent extends DFUserAgent {
             // The item is successfully purchased from the store.
         }
     }
+
+    /**
+     * This class chooses the best item purchase that the customer can do based on his preferences and discount.
+     */
+    private class ChooseBestItemBehaviour extends Behaviour{
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void action() {
+            // TODO Implement the process of choosing
+
+        }
+
+        @Override
+        public boolean done() {
+            // TODO Auto-generated method stub
+            return false;
+        }        
+    }
 }
