@@ -22,4 +22,9 @@ public class CustomerUnitTests {
         double influenceability = customer.getInfluenceability();         
         assertTrue(influenceability >= 1 && influenceability <= 10, "Customer generateInfluenceability is not in the expected range.");
     }
+
+    @Test
+    public void testPurchaseItemBehaviour(){
+        //CustomerAgent customer = new CustomerAgent();
+    }
 }
