@@ -1,6 +1,8 @@
 package org.feup.aiad.group08.agents;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
@@ -21,16 +23,29 @@ import jade.proto.AchieveREResponder;
 public class ManagerAgent extends DFUserAgent {
 
     private static final long serialVersionUID = 1L;
+    private static final int DEFAULT_MAX_ITERATIONS = 5;
 
-    private SystemPhase currentPhase;
+    private SystemPhase currentPhase = SystemPhase.SALES;
     private int salesPhaseElapsedTime;
+    private int maxIterations;
+    private int currentIteration;
+    // Total stores that exist during the current iteration
+    private List<AID> stores = new ArrayList<>();
+    // Stores that have finished purchasing for the current iteration
+    private Vector<AID> stockPurchaseConfirmations = new Vector<>();
 
     public int salesPhaseDuration;
-
-    public ManagerAgent(int salesPhaseDuration) {
+    
+    public ManagerAgent(int salesPhaseDuration, int maxIterations) {
         this.salesPhaseDuration = salesPhaseDuration;
-
+        this.maxIterations = maxIterations;
+        currentIteration = 1;
+        
         addSystemRole(SystemRole.MANAGER);
+    }
+    
+    public ManagerAgent(int salesPhaseDuration) {
+        this(salesPhaseDuration, DEFAULT_MAX_ITERATIONS);
     }
 
     @Override
@@ -39,7 +54,7 @@ public class ManagerAgent extends DFUserAgent {
 
         addBehaviour(new PhaseControlBehaviour(this, 1000));
         
-        startRestockPhase();
+        nextPhase();
     }
 
     private void nextPhase() {
@@ -48,7 +63,13 @@ public class ManagerAgent extends DFUserAgent {
                 startSalesPhase();
                 break;
             case SALES:
-                startRestockPhase();
+                if (currentIteration <= maxIterations) {
+                    System.out.println("Iteration " + currentIteration + "/" + maxIterations);
+                    startRestockPhase();
+                    currentIteration++;
+                }
+                else
+                    System.out.println("Finished " + maxIterations + " iterations");
                 break;
             default:
                 break;
@@ -59,7 +80,9 @@ public class ManagerAgent extends DFUserAgent {
         currentPhase = SystemPhase.RESTOCK;
         System.out.println("RESTOCK PHASE");
 
-        List<AID> stores = search(SystemRole.STORE);
+        stockPurchaseConfirmations.clear();
+
+        stores = search(SystemRole.STORE);
         ACLMessage msg = MessageFactory.authorizeStockPurchase(stores.toArray(new AID[0]));
 
         System.out.println("Stores found: " + stores.size());
@@ -129,6 +152,11 @@ public class ManagerAgent extends DFUserAgent {
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
             System.out.println("Manager received stock purchase confirmation from store " + request.getSender().getName());
+
+            stockPurchaseConfirmations.add(request.getSender());
+
+            if (stockPurchaseConfirmations.size() == stores.size())
+                    nextPhase(); // start sales phase when all stores have finished purchasing stock
 
             return MessageFactory.confirmStockPurchaseReply(request);
         }

@@ -51,6 +51,6 @@ public class Main {
     }
     
     private static void createManager() throws StaleProxyException {
-        container.acceptNewAgent("manager", new ManagerAgent(5)).start();
+        container.acceptNewAgent("manager", new ManagerAgent(5, 3)).start();
     }
 }
