@@ -1,18 +1,20 @@
 package org.feup.aiad.group08.agents;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Vector;
 
-import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 
-import java.util.Vector;
-
-import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
+import org.feup.aiad.group08.utils.Distribution;
+import org.feup.aiad.group08.definitions.SalesInfo;
 
 public class CustomerAgent extends DFUserAgent {
 
@@ -22,40 +24,34 @@ public class CustomerAgent extends DFUserAgent {
     private static final int INFLUENCE_LOWER_LIMIT = 1;
 
     private float balance; // The total funds availaible for the customer to purchase.
-    private double influenceability; // Each agent can be more easily or not influenced by promotions
-    private Vector<String> storePreferences;
+    private float influenceability; // Each agent can be more easily or not influenced by promotions
+    private List<StoreType> storePreferences;
 
-    public CustomerAgent(float initBalance, Vector<String> storePreferences) {
+    private Vector<SalesInfo> salesInfo = new Vector<>();
+
+    public CustomerAgent(float initBalance, List<StoreType> storePreferences) {
         addSystemRole(SystemRole.CUSTOMER);
 
         balance = initBalance;
         this.storePreferences = storePreferences;
         influenceability = generateInfluenceability();
-
-    }
-
-    public CustomerAgent() {
-        balance = 100;
-        storePreferences = new Vector<String>(2);
-        storePreferences.add("Tech");
-        storePreferences.add("Food");
-        influenceability = generateInfluenceability();
+        
     }
 
     public float getBalance() {
         return balance;
     }
 
-    public Vector<String> getStorePreferences() {
+    public List<StoreType> getStorePreferences() {
         return storePreferences;
     }
 
-    public double getInfluenceability() {
+    public float getInfluenceability() {
         return influenceability;
     }
 
     // This method generates a random integer between an interval that will define how influentable the costumer is to sales.
-    private static double generateInfluenceability() {
+    private static float generateInfluenceability() {
         return new Random().nextInt(INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT + 1) + INFLUENCE_LOWER_LIMIT;
     }
 
@@ -81,7 +77,23 @@ public class CustomerAgent extends DFUserAgent {
         }
     }
 
-    private void decideBestPurchase(){
+    private SalesInfo decideBestPurchase(){
+        Map<SalesInfo, Float> preferenceProbs = new HashMap<>();
+
+        for (SalesInfo sInfo : salesInfo) {
+            float preferenceProb = calculatePreferenceProb(sInfo.storeType());
+            preferenceProbs.put(sInfo, preferenceProb * sInfo.discountPercentage() * influenceability);
+        }
         
+        Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
+
+        return salesDist.sample();        
+    }
+
+    private float calculatePreferenceProb(StoreType preference){
+        int index = storePreferences.indexOf(preference);
+
+        // The last element of storePreferences list has the highest percentage
+        return (float)(index + 1)/storePreferences.size();
     }
 }
