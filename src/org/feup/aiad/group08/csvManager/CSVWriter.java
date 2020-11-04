@@ -11,6 +11,13 @@ public class CSVWriter {
     private String delimiter;
     private List<List<String>> data;
     
+    /**
+     * This class writes to a file data from a List<List<String>>.
+     * @param fileToWriteName - The name of the file to write to
+     * @param delimiter - The delimiter that separates the values in the file, normally in .csv it can be ";" or ","
+     * @param data - The List<List<String>> that stores the information we want to write
+     * @throws IOException
+     */
     public CSVWriter (String fileToWriteName, String delimiter, List<List<String>> data) throws IOException{
 
         this.fileToWriteName = fileToWriteName;

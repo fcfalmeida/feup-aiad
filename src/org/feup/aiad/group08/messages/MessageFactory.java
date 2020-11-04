@@ -68,4 +68,12 @@ public class MessageFactory {
     public static ACLMessage confirmStockPurchaseReply(ACLMessage from) {
         return createReply(from, ACLMessage.INFORM);
     }
+
+    public static ACLMessage authorizeItemPurchase(AID... receivers) {
+        return createMessage(MessageType.AUTHORIZE_ITEM_PURCHASE, ACLMessage.REQUEST, receivers);
+    }
+
+    public static ACLMessage authorizeItemPurchaseReply(ACLMessage from) {
+        return createReply(from, ACLMessage.INFORM);
+    }
 }
