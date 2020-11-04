@@ -13,8 +13,8 @@ public class CsvManagerUnitTests {
     public static void main(String[] args) throws IOException {
 
         System.out.println(new File("."));
-        String readFileName = ".\\data\\input\\customersTest.csv";
-        String writeFileName = ".\\data\\output\\customerBuyResults.csv";
+        String readFileName = "./data/input/customersTest.csv";
+        String writeFileName = "./data/output/customerBuyResults.csv";
 
         String delimiter = ";";
 
