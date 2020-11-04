@@ -1,0 +1,33 @@
+package org.feup.aiad.unit.testing;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.feup.aiad.group08.csvManager.CSVReader;
+import org.feup.aiad.group08.csvManager.CSVWriter;
+
+import java.util.List;
+import java.util.Arrays;
+
+public class CsvManagerUnitTests {
+
+    public static void main(String[] args) throws IOException {
+
+        System.out.println(new File("."));
+        String readFileName = "customersTest.csv";
+        String writeFileName = "customerBuyResults.csv";
+
+        String delimiter = ";";
+
+        CSVReader csvReader = new CSVReader(readFileName, delimiter);
+
+        List<List<String>> data = csvReader.getData();
+
+        for (List<String> customer : data) {
+            for (String customerAttribute : customer) {
+                System.out.println(customerAttribute);
+            }
+            System.out.println();
+        }
+    }
+}

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CSVReader {
@@ -27,6 +28,8 @@ public class CSVReader {
         this.fileToReadName = fileToReadName;
         this.delimiter = delimiter;
 
+        this.data = new ArrayList<>();
+
         try ( BufferedReader buffReader = new BufferedReader( new FileReader(fileToReadName))) {
 
             String line;
@@ -43,5 +46,9 @@ public class CSVReader {
     
     public String getDelimiter(){
         return delimiter;
-    }    
+    }
+
+    public List<List<String>> getData(){
+        return data;
+    }
 }
