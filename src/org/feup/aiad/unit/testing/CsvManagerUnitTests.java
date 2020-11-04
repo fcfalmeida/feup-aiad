@@ -19,6 +19,7 @@ public class CsvManagerUnitTests {
 
         String delimiter = ";";
 
+        // This tests the CSVReader Class
         CSVReader csvReader = new CSVReader(readFileName, delimiter);
 
         List<List<String>> data = csvReader.getData();
@@ -29,5 +30,13 @@ public class CsvManagerUnitTests {
             }
             System.out.println();
         }
+
+        // This tests the CSVWriter Class
+        
+        CSVWriter csvWriter = new CSVWriter(writeFileName, delimiter, data);
+
+
+
+
     }
 }
