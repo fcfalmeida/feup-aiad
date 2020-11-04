@@ -21,8 +21,6 @@ public class StoreAgent extends DFUserAgent {
     private static final long serialVersionUID = -3205276776739404040L;
     private float balanceAvailable;
     private int stock;
-    private int sale;
-    private float price;
 
     public StoreAgent() {
         addSystemRole(SystemRole.STORE);
@@ -52,10 +50,6 @@ public class StoreAgent extends DFUserAgent {
         // if (stock == 0) {
         // }
         return stock;
-    }
-
-    public float getFinalPrice() {
-        return (price - (price * sale));
     }
 
     private class ReceiveStockPurchaseAuthorizationBehaviour extends AchieveREResponder {
