@@ -5,8 +5,8 @@ import java.util.Objects;
 
 import jade.core.AID;
 
-public class SalesInfo implements Serializable{
-    
+public class SalesInfo implements Serializable {
+
     private static final long serialVersionUID = -6234236657351857452L;
     private float itemPrice;
     private float discountPercentage;
@@ -19,23 +19,23 @@ public class SalesInfo implements Serializable{
         this.storeType = storeType;
         this.storeName = storeName;
     }
-    
-    public float getItemPrice(){
+
+    public float getItemPrice() {
         return itemPrice;
     }
 
-    public float discountPercentage(){
+    public float discountPercentage() {
         return itemPrice;
     }
-    
-    public StoreType storeType(){
+
+    public StoreType storeType() {
         return storeType;
     }
 
     public AID getStoreName() {
         return storeName;
     }
-    
+
     public float calculateFinalPrice() {
         return (itemPrice - (itemPrice * discountPercentage));
     }
@@ -44,7 +44,10 @@ public class SalesInfo implements Serializable{
     public int hashCode() {
         return Objects.hash(itemPrice, discountPercentage, storeType, storeName);
     }
+
+    @Override
+    public String toString() {
+        return storeName.getLocalName() + "(" + storeType + ") - " + "Item Price: " + itemPrice + " | Discount: "
+                + discountPercentage;
+    }
 }
-
-
-   

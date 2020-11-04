@@ -12,17 +12,22 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
+import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.SalesInfo;
+import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 
 public class StoreAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -3205276776739404040L;
+    private StoreType type;
     private float balanceAvailable;
     private int stock;
 
-    public StoreAgent() {
+    public StoreAgent(StoreType type) {
+        this.type = type;
         addSystemRole(SystemRole.STORE);
     }
 
@@ -30,8 +35,10 @@ public class StoreAgent extends DFUserAgent {
     protected void setup() {
         super.setup();
 
-        addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this, 
-            MessageTemplate.MatchConversationId(MessageType.AUTHORIZE_STOCK_PURCHASE.toString())));
+        addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this,
+                MessageTemplate.MatchConversationId(MessageType.AUTHORIZE_STOCK_PURCHASE.toString())));
+
+        addBehaviour(new SendSaleInfo(this));
     }
 
     public float getBalance() {
@@ -39,8 +46,8 @@ public class StoreAgent extends DFUserAgent {
     }
 
     //
-    public int getStock(){
-        Random rand = new Random(); 
+    public int getStock() {
+        Random rand = new Random();
         int numberRequestStock = rand.nextInt(51);
         return numberRequestStock;
     }
@@ -66,7 +73,8 @@ public class StoreAgent extends DFUserAgent {
         }
 
         @Override
-        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException {
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
             System.out.println("Store " + getAID().getName() + " received stock purchase authorization from Manager");
 
             AID warehouse = searchOne(SystemRole.WAREHOUSE);
@@ -77,7 +85,7 @@ public class StoreAgent extends DFUserAgent {
 
             ACLMessage res = request.createReply();
             res.setPerformative(ACLMessage.INFORM);
-            
+
             return res;
         }
 
@@ -113,7 +121,34 @@ public class StoreAgent extends DFUserAgent {
         }
     }
 
-    private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder{
+    private class SendSaleInfo extends AchieveREResponder {
+
+        private static final long serialVersionUID = -6144402641497240759L;
+
+        public SendSaleInfo(Agent a) {
+            super(a, MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
+            MessageTemplate.MatchConversationId(MessageType.STORE_SALES_INFO.toString())));
+        }
+
+        @Override
+        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
+            return null;
+        }
+
+        @Override
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+            
+            // TODO: decide sale
+            SalesInfo si = new SalesInfo(0, 0, type, getAID());
+            
+            ACLMessage reply = MessageFactory.storeSalesInfoReply(request, si);
+
+            return reply;
+        }
+    }
+
+    private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder {
 
         private static final long serialVersionUID = 1L;
 

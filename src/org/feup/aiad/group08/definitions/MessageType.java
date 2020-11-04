@@ -12,8 +12,13 @@ public enum MessageType {
     // Sent by ManagerAgent to allow CustomerAgent to purchase item
     AUTHORIZE_ITEM_PURCHASE("authorize-item-purchase"),
     // Sent by CustomerAgent to StoreAgent to request item purchase
-    PURCHASE_ITEM("purchase-item");
-    
+    PURCHASE_ITEM("purchase-item"),
+
+    // Sent by StoreAgent to AdvertiserAgent to let them know what sale the store will be doing
+    STORE_SALES_INFO("store-sales-info"),
+    // Sent by AdvertiserAgent to all CustomerAgent to inform them of current sales
+    ADVERTISER_SALES_INFO("advertiser-sales-info");
+
     private final String type;
 
     MessageType(final String type) {

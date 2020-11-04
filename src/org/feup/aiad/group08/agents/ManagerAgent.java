@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
+import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemPhase;
 
@@ -33,6 +34,8 @@ public class ManagerAgent extends DFUserAgent {
     private List<AID> stores = new ArrayList<>();
     // Stores that have finished purchasing for the current iteration
     private Vector<AID> stockPurchaseConfirmations = new Vector<>();
+    // Total customers that exist during the current iteration
+    private List<AID> customers = new ArrayList<>();
 
     public int salesPhaseDuration;
     
@@ -53,6 +56,8 @@ public class ManagerAgent extends DFUserAgent {
         super.setup();
 
         addBehaviour(new PhaseControlBehaviour(this, 1000));
+        addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(this,
+                    MessageTemplate.MatchConversationId(MessageType.CONFIRM_STOCK_PURCHASE.toString())));
         
         nextPhase();
     }
@@ -95,7 +100,9 @@ public class ManagerAgent extends DFUserAgent {
         salesPhaseElapsedTime = 0;
         System.out.println("SALES PHASE");
 
-        // TODO: notify all CustomerAgent that they can begin shopping
+        customers = search(SystemRole.CUSTOMER);
+
+        addBehaviour(new SendSalesPhaseNotification(this));
     }
 
     private class PhaseControlBehaviour extends TickerBehaviour {
@@ -108,6 +115,9 @@ public class ManagerAgent extends DFUserAgent {
 
         @Override
         protected void onTick() {
+            if (currentIteration > maxIterations)
+                stop();
+            
             if (currentPhase.equals(SystemPhase.SALES)) {
                 salesPhaseElapsedTime++;
 
@@ -129,9 +139,6 @@ public class ManagerAgent extends DFUserAgent {
         @Override
         protected void handleInform(ACLMessage inform) {
             System.out.println("Store " + inform.getSender().getName() + " will purchase stock");
-
-            addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(getAgent(),
-                    MessageTemplate.MatchConversationId(MessageType.CONFIRM_STOCK_PURCHASE.toString())));
         }
     }
 
@@ -160,5 +167,19 @@ public class ManagerAgent extends DFUserAgent {
 
             return MessageFactory.confirmStockPurchaseReply(request);
         }
+    }
+
+    private class SendSalesPhaseNotification extends InformBehaviour {
+
+        private static final long serialVersionUID = 7031131499464261774L;
+
+        public SendSalesPhaseNotification(Agent agent) {
+            super(agent, MessageType.AUTHORIZE_ITEM_PURCHASE);
+
+            AID advertiser = searchOne(SystemRole.ADVERTISER);
+            receivers = new ArrayList<>(customers);
+            receivers.add(advertiser);
+        }
+
     }
 }

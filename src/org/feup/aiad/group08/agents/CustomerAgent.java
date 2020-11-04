@@ -10,10 +10,13 @@ import java.util.Vector;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
+import jade.tools.sniffer.Message;
 
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.utils.Distribution;
+import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 
 public class CustomerAgent extends DFUserAgent {
@@ -35,7 +38,11 @@ public class CustomerAgent extends DFUserAgent {
         balance = initBalance;
         this.storePreferences = storePreferences;
         influenceability = generateInfluenceability();
-        
+    }
+
+    @Override
+    protected void setup() {
+        addBehaviour(new ReceiveItemPurchaseAuthorization(this));
     }
 
     public float getBalance() {
@@ -50,9 +57,26 @@ public class CustomerAgent extends DFUserAgent {
         return influenceability;
     }
 
-    // This method generates a random integer between an interval that will define how influentable the costumer is to sales.
+    // This method generates a random integer between an interval that will define
+    // how influentable the costumer is to sales.
     private static float generateInfluenceability() {
         return new Random().nextInt(INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT + 1) + INFLUENCE_LOWER_LIMIT;
+    }
+
+    private class ReceiveItemPurchaseAuthorization extends ReceiveInformBehaviour {
+
+        private static final long serialVersionUID = 1L;
+
+        public ReceiveItemPurchaseAuthorization(Agent agent) {
+            super(agent, MessageType.AUTHORIZE_ITEM_PURCHASE);
+        }
+
+        @Override
+        public void processMessage(ACLMessage msg) {
+            System.out.println("Customer " + getAgent().getLocalName() + " can purchase item");
+            // TODO addBehaviour(new PurchaseItemBehaviour())
+        }
+
     }
 
     /**

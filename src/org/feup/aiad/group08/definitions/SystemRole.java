@@ -4,7 +4,8 @@ public enum SystemRole {
     STORE("store"),
     CUSTOMER("customer"),
     MANAGER("manager"),
-    WAREHOUSE("warehouse");
+    WAREHOUSE("warehouse"),
+    ADVERTISER("advertiser");
     
     private final String type;
 
