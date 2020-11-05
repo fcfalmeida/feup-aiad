@@ -177,7 +177,7 @@ public class ManagerAgent extends DFUserAgent {
             super(agent, MessageType.AUTHORIZE_ITEM_PURCHASE);
 
             AID advertiser = searchOne(SystemRole.ADVERTISER);
-            receivers = new ArrayList<>(customers);
+            // receivers = new ArrayList<>(customers);
             receivers.add(advertiser);
         }
 

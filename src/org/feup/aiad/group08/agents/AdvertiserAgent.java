@@ -75,7 +75,7 @@ public class AdvertiserAgent extends DFUserAgent {
             }
 
             if (salesInfo.size() == stores.size()) {
-                System.out.println("Advertiser receiver sales info from all stores, advertising sales to customers...");
+                System.out.println("Advertiser received sales info from all stores, advertising sales to customers...");
                 addBehaviour(new AdvertiseBehaviour(getAgent()));
             }
         }

@@ -9,8 +9,8 @@ import java.util.Vector;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
-import jade.tools.sniffer.Message;
 
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
@@ -30,7 +30,7 @@ public class CustomerAgent extends DFUserAgent {
     private float influenceability; // Each agent can be more easily or not influenced by promotions
     private List<StoreType> storePreferences;
 
-    private Vector<SalesInfo> salesInfo = new Vector<>();
+    private List<SalesInfo> salesInfo = new Vector<>();
 
     public CustomerAgent(float initBalance, List<StoreType> storePreferences) {
         addSystemRole(SystemRole.CUSTOMER);
@@ -42,7 +42,8 @@ public class CustomerAgent extends DFUserAgent {
 
     @Override
     protected void setup() {
-        addBehaviour(new ReceiveItemPurchaseAuthorization(this));
+        super.setup();
+        addBehaviour(new ReceiveAdvertisementBehaviour(this));
     }
 
     public float getBalance() {
@@ -63,20 +64,24 @@ public class CustomerAgent extends DFUserAgent {
         return new Random().nextInt(INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT + 1) + INFLUENCE_LOWER_LIMIT;
     }
 
-    private class ReceiveItemPurchaseAuthorization extends ReceiveInformBehaviour {
+    private class ReceiveAdvertisementBehaviour extends ReceiveInformBehaviour {
 
         private static final long serialVersionUID = 1L;
 
-        public ReceiveItemPurchaseAuthorization(Agent agent) {
-            super(agent, MessageType.AUTHORIZE_ITEM_PURCHASE);
+        public ReceiveAdvertisementBehaviour(Agent agent) {
+            super(agent, MessageType.ADVERTISER_SALES_INFO);
         }
 
         @Override
         public void processMessage(ACLMessage msg) {
-            System.out.println("Customer " + getAgent().getLocalName() + " can purchase item");
-            // TODO addBehaviour(new PurchaseItemBehaviour())
+            System.out.println("Customer " + getAgent().getLocalName() + " received sales info from Advertiser");
+            try {
+                salesInfo = (Vector<SalesInfo>) msg.getContentObject();
+                // TODO addBehaviour(new PurchaseItemBehaviour())
+            } catch (UnreadableException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     /**

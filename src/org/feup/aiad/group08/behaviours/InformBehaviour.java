@@ -2,6 +2,7 @@ package org.feup.aiad.group08.behaviours;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,12 +19,14 @@ public class InformBehaviour extends OneShotBehaviour {
     private Agent agent;
     private MessageType messageType;
     private Serializable content;
-    protected List<AID> receivers;
+    protected List<AID> receivers = new ArrayList<>();
 
     public InformBehaviour(Agent agent, MessageType messageType, AID... receivers) {
         this.agent = agent;
         this.messageType = messageType;
-        this.receivers = Arrays.asList(receivers);
+
+        if (receivers != null)
+            this.receivers = new ArrayList<>(Arrays.asList(receivers));
     }
 
     public InformBehaviour(Agent agent, MessageType messageType, Serializable content, AID... receivers) {

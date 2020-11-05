@@ -1,6 +1,9 @@
 package org.feup.aiad.group08;
 
+import java.util.ArrayList;
+
 import org.feup.aiad.group08.agents.AdvertiserAgent;
+import org.feup.aiad.group08.agents.CustomerAgent;
 import org.feup.aiad.group08.agents.ManagerAgent;
 import org.feup.aiad.group08.agents.StoreAgent;
 import org.feup.aiad.group08.agents.WarehouseAgent;
@@ -33,6 +36,10 @@ public class Main {
         // Wait for stores to register in the DF
         Utils.sleep(500);
 
+        createCustomers();
+        // Wait for customers to register in the DF
+        Utils.sleep(500);
+
         // Wait for advertiser to register in the DF
         createAdvertiser();
         Utils.sleep(500);
@@ -54,6 +61,14 @@ public class Main {
         container.acceptNewAgent("store7", new StoreAgent(StoreType.BOOKS)).start();
         container.acceptNewAgent("store8", new StoreAgent(StoreType.TECH)).start();
         container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES)).start();
+    }
+
+    private static void createCustomers() throws StaleProxyException {
+        container.acceptNewAgent("customer1", new CustomerAgent(100, new ArrayList<>())).start();
+        container.acceptNewAgent("customer2", new CustomerAgent(200, new ArrayList<>())).start();
+        container.acceptNewAgent("customer3", new CustomerAgent(10, new ArrayList<>())).start();
+        container.acceptNewAgent("customer4", new CustomerAgent(50, new ArrayList<>())).start();
+        container.acceptNewAgent("customer5", new CustomerAgent(20, new ArrayList<>())).start();;
     }
     
     private static void createManager() throws StaleProxyException {
