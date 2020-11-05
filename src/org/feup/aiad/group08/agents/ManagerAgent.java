@@ -7,6 +7,7 @@ import java.util.Vector;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.behaviours.InformBehaviour;
+import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemPhase;
 
@@ -38,15 +39,15 @@ public class ManagerAgent extends DFUserAgent {
     private List<AID> customers = new ArrayList<>();
 
     public int salesPhaseDuration;
-    
+
     public ManagerAgent(int salesPhaseDuration, int maxIterations) {
         this.salesPhaseDuration = salesPhaseDuration;
         this.maxIterations = maxIterations;
         currentIteration = 1;
-        
+
         addSystemRole(SystemRole.MANAGER);
     }
-    
+
     public ManagerAgent(int salesPhaseDuration) {
         this(salesPhaseDuration, DEFAULT_MAX_ITERATIONS);
     }
@@ -56,9 +57,8 @@ public class ManagerAgent extends DFUserAgent {
         super.setup();
 
         addBehaviour(new PhaseControlBehaviour(this, 1000));
-        addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(this,
-                    MessageTemplate.MatchConversationId(MessageType.CONFIRM_STOCK_PURCHASE.toString())));
-        
+        addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(this));
+
         nextPhase();
     }
 
@@ -72,8 +72,7 @@ public class ManagerAgent extends DFUserAgent {
                     System.out.println("Iteration " + currentIteration + "/" + maxIterations);
                     startRestockPhase();
                     currentIteration++;
-                }
-                else
+                } else
                     System.out.println("Finished " + maxIterations + " iterations");
                 break;
             default:
@@ -86,13 +85,9 @@ public class ManagerAgent extends DFUserAgent {
         System.out.println("RESTOCK PHASE");
 
         stockPurchaseConfirmations.clear();
-
         stores = search(SystemRole.STORE);
-        ACLMessage msg = MessageFactory.authorizeStockPurchase(stores.toArray(new AID[0]));
 
-        System.out.println("Stores found: " + stores.size());
-
-        addBehaviour(new AuthorizeStockPurchaseBehaviour(this, msg));
+        addBehaviour(new AuthorizeStockPurchaseBehaviour(this));
     }
 
     private void startSalesPhase() {
@@ -117,7 +112,7 @@ public class ManagerAgent extends DFUserAgent {
         protected void onTick() {
             if (currentIteration > maxIterations)
                 stop();
-            
+
             if (currentPhase.equals(SystemPhase.SALES)) {
                 salesPhaseElapsedTime++;
 
@@ -128,45 +123,35 @@ public class ManagerAgent extends DFUserAgent {
         }
     }
 
-    private class AuthorizeStockPurchaseBehaviour extends AchieveREInitiator {
+    private class AuthorizeStockPurchaseBehaviour extends InformBehaviour {
 
         private static final long serialVersionUID = -5814692859721095838L;
 
-        public AuthorizeStockPurchaseBehaviour(Agent a, ACLMessage msg) {
-            super(a, msg);
-        }
-
-        @Override
-        protected void handleInform(ACLMessage inform) {
-            System.out.println("Store " + inform.getSender().getName() + " will purchase stock");
+        public AuthorizeStockPurchaseBehaviour(Agent agent) {
+            super(agent, MessageType.AUTHORIZE_STOCK_PURCHASE);
+            receivers = stores;
         }
     }
 
-    private class ReceiveStockPurchaseConfirmationBehaviour extends AchieveREResponder {
+    private class ReceiveStockPurchaseConfirmationBehaviour extends ReceiveInformBehaviour {
 
-        private static final long serialVersionUID = 7438211244918027385L;
+        private static final long serialVersionUID = 1079771040428551493L;
 
-        public ReceiveStockPurchaseConfirmationBehaviour(Agent a, MessageTemplate mt) {
-            super(a, mt);
+        public ReceiveStockPurchaseConfirmationBehaviour(Agent agent) {
+            super(agent, MessageType.CONFIRM_STOCK_PURCHASE);
         }
 
         @Override
-        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
-            return null;
-        }
+        public void processMessage(ACLMessage msg) {
+            System.out.println(
+                    "Manager received stock purchase confirmation from store " + msg.getSender().getLocalName());
 
-        @Override
-        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
-                throws FailureException {
-            System.out.println("Manager received stock purchase confirmation from store " + request.getSender().getName());
-
-            stockPurchaseConfirmations.add(request.getSender());
+            stockPurchaseConfirmations.add(msg.getSender());
 
             if (stockPurchaseConfirmations.size() == stores.size())
-                    nextPhase(); // start sales phase when all stores have finished purchasing stock
-
-            return MessageFactory.confirmStockPurchaseReply(request);
+                nextPhase(); // start sales phase when all stores have finished purchasing stock
         }
+
     }
 
     private class SendSalesPhaseNotification extends InformBehaviour {
@@ -177,7 +162,6 @@ public class ManagerAgent extends DFUserAgent {
             super(agent, MessageType.AUTHORIZE_ITEM_PURCHASE);
 
             AID advertiser = searchOne(SystemRole.ADVERTISER);
-            // receivers = new ArrayList<>(customers);
             receivers.add(advertiser);
         }
 

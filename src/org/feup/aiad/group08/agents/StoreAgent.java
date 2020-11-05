@@ -13,6 +13,7 @@ import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.behaviours.InformBehaviour;
+import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 import org.feup.aiad.group08.definitions.StoreType;
@@ -35,9 +36,7 @@ public class StoreAgent extends DFUserAgent {
     protected void setup() {
         super.setup();
 
-        addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this,
-                MessageTemplate.MatchConversationId(MessageType.AUTHORIZE_STOCK_PURCHASE.toString())));
-
+        addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this));
         addBehaviour(new SendSaleInfo(this));
     }
 
@@ -59,36 +58,23 @@ public class StoreAgent extends DFUserAgent {
         return stock;
     }
 
-    private class ReceiveStockPurchaseAuthorizationBehaviour extends AchieveREResponder {
+    private class ReceiveStockPurchaseAuthorizationBehaviour extends ReceiveInformBehaviour {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -3093017051433226823L;
 
-        public ReceiveStockPurchaseAuthorizationBehaviour(Agent a, MessageTemplate mt) {
-            super(a, mt);
+        public ReceiveStockPurchaseAuthorizationBehaviour(Agent agent) {
+            super(agent, MessageType.AUTHORIZE_STOCK_PURCHASE);
         }
 
         @Override
-        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
-            return null;
-        }
-
-        @Override
-        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
-                throws FailureException {
-            System.out.println("Store " + getAID().getName() + " received stock purchase authorization from Manager");
+        public void processMessage(ACLMessage msg) {
+            System.out.println("Store " + getAID().getLocalName() + " received stock purchase authorization from Manager");
 
             AID warehouse = searchOne(SystemRole.WAREHOUSE);
-
             ACLMessage stockPurchaseMsg = MessageFactory.purchaseStock(warehouse);
 
             addBehaviour(new PurchaseStockBehaviour(getAgent(), stockPurchaseMsg));
-
-            ACLMessage res = request.createReply();
-            res.setPerformative(ACLMessage.INFORM);
-
-            return res;
         }
-
     }
 
     private class PurchaseStockBehaviour extends AchieveREInitiator {
@@ -105,19 +91,18 @@ public class StoreAgent extends DFUserAgent {
 
             // Stock purchase done
             // Tell the manager that this store is done purchasing stock
-            AID manager = searchOne(SystemRole.MANAGER);
-            ACLMessage msg = MessageFactory.confirmStockPurchase(manager);
-
-            addBehaviour(new SendStockPurchaseConfirmationBehaviour(getAgent(), msg));
+            addBehaviour(new SendStockPurchaseConfirmationBehaviour(getAgent()));
         }
     }
 
-    private class SendStockPurchaseConfirmationBehaviour extends AchieveREInitiator {
+    private class SendStockPurchaseConfirmationBehaviour extends InformBehaviour {
 
-        private static final long serialVersionUID = 8122070889759051930L;
+        private static final long serialVersionUID = -1778420810173137218L;
 
-        public SendStockPurchaseConfirmationBehaviour(Agent a, ACLMessage msg) {
-            super(a, msg);
+        public SendStockPurchaseConfirmationBehaviour(Agent agent) {
+            super(agent, MessageType.CONFIRM_STOCK_PURCHASE);
+            AID manager = searchOne(SystemRole.MANAGER);
+            receivers.add(manager);
         }
     }
 
