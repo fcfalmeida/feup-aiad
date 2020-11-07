@@ -1,6 +1,8 @@
 package org.feup.aiad.group08.agents;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -9,6 +11,7 @@ import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 
@@ -16,6 +19,8 @@ import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
+import org.feup.aiad.group08.definitions.StockPurchaseConditions;
+import org.feup.aiad.group08.definitions.StockPurchaseReceipt;
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
@@ -23,12 +28,16 @@ import org.feup.aiad.group08.messages.MessageFactory;
 public class StoreAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -3205276776739404040L;
-    private StoreType type;
-    private float balanceAvailable;
-    private int stock;
+    private final StoreType type;
+    private float balanceAvailable = 5000;
+    private final int stockCapacity;
+    private int currentStock;
+    // stock sold in each iteration
+    private List<Integer> salesHistory = new ArrayList<>();
 
-    public StoreAgent(StoreType type) {
+    public StoreAgent(StoreType type, int stockCapacity) {
         this.type = type;
+        this.stockCapacity = stockCapacity;
         addSystemRole(SystemRole.STORE);
     }
 
@@ -38,24 +47,6 @@ public class StoreAgent extends DFUserAgent {
 
         addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this));
         addBehaviour(new SendSaleInfo(this));
-    }
-
-    public float getBalance() {
-        return balanceAvailable;
-    }
-
-    //
-    public int getStock() {
-        Random rand = new Random();
-        int numberRequestStock = rand.nextInt(51);
-        return numberRequestStock;
-    }
-    //
-
-    public float checkStock() {
-        // if (stock == 0) {
-        // }
-        return stock;
     }
 
     private class ReceiveStockPurchaseAuthorizationBehaviour extends ReceiveInformBehaviour {
@@ -68,13 +59,98 @@ public class StoreAgent extends DFUserAgent {
 
         @Override
         public void processMessage(ACLMessage msg) {
-            System.out.println("Store " + getAID().getLocalName() + " received stock purchase authorization from Manager");
+            System.out.println(
+                    "Store " + getAID().getLocalName() + " received stock purchase authorization from Manager");
 
             AID warehouse = searchOne(SystemRole.WAREHOUSE);
-            ACLMessage stockPurchaseMsg = MessageFactory.purchaseStock(warehouse);
+            ACLMessage requestSpcMessage = MessageFactory.requestStockPurchaseConditions(warehouse);
+            addBehaviour(new RequestStockPurchaseConditions(getAgent(), requestSpcMessage));
+        }
+    }
+
+    private class RequestStockPurchaseConditions extends AchieveREInitiator {
+
+        private static final long serialVersionUID = -6579450317631086255L;
+
+        public RequestStockPurchaseConditions(Agent a, ACLMessage msg) {
+            super(a, msg);
+        }
+
+        @Override
+        protected void handleInform(ACLMessage inform) {
+            StockPurchaseConditions spc = null;
+            try {
+                spc = (StockPurchaseConditions) inform.getContentObject();
+            } catch (UnreadableException e1) {
+                e1.printStackTrace();
+            }
+
+            int purchaseQuantity = decidePurchaseQuantity(spc);
+
+            System.out.println("Store " + getLocalName() + " has decided to purchase " + purchaseQuantity
+                    + " units from the Warehouse");
+
+            AID warehouse = inform.getSender();
+            ACLMessage stockPurchaseMsg = MessageFactory.purchaseStock(warehouse, purchaseQuantity);
 
             addBehaviour(new PurchaseStockBehaviour(getAgent(), stockPurchaseMsg));
         }
+    }
+
+    private int decidePurchaseQuantity(StockPurchaseConditions spc) {
+        Map<Integer, Float> quantityDiscountModel = spc.getQuantityDiscountModel();
+
+        // Initialize max quantity with current stock capacity
+        int maxQuantity = stockCapacity - currentStock;
+
+        // Average sales in the past
+        int salesAverage = calculateSalesAverage();
+
+        // Determine the max purchasable quantity according to the model
+        for (Map.Entry<Integer, Float> quantDiscount : quantityDiscountModel.entrySet()) {
+            float unitPriceWithDiscount = spc.getBaseUnitPrice() - (spc.getBaseUnitPrice() * quantDiscount.getValue());
+            // Minimum quantity to get discount
+            int minQuantity = quantDiscount.getKey();
+
+            // If max quantity is lower than min quantity, that means we can't get the
+            // current
+            // discount so we break the loop
+            if (maxQuantity < minQuantity)
+                break;
+
+            // Purchasable quantity depends on available balance
+            int purchasableQuantity = (int) (balanceAvailable / unitPriceWithDiscount);
+
+            // If balance isn't enough, the new max equals the purchasable quantity
+            if (purchasableQuantity < maxQuantity)
+                maxQuantity = purchasableQuantity;
+        }
+
+        // Calculate the average between the sales average and the max quantity
+        // calculated previously. Then take away the current stock to determine
+        // the quantity that should be purchased to achieve target quantity
+        if (salesAverage > 0)
+            return (salesAverage + maxQuantity) / 2 - currentStock;
+        else
+            return maxQuantity;
+    }
+
+    /**
+     * Calculates the average stock sold in the past
+     * 
+     * @return average stock sold in past iterations, zero if no previous sales
+     *         record
+     */
+    private int calculateSalesAverage() {
+        if (salesHistory.isEmpty())
+            return 0;
+
+        float sum = 0;
+
+        for (Integer sold : salesHistory)
+            sum += sold;
+
+        return (int) Math.floor(sum / salesHistory.size());
     }
 
     private class PurchaseStockBehaviour extends AchieveREInitiator {
@@ -87,11 +163,19 @@ public class StoreAgent extends DFUserAgent {
 
         @Override
         protected void handleInform(ACLMessage inform) {
-            System.out.println("Store " + getAID().getName() + " received stock purchase confirmation from Warehouse");
+            StockPurchaseReceipt receipt;
+            try {
+                receipt = (StockPurchaseReceipt) inform.getContentObject();
+                
+                System.out.println("Store " + getAID().getName()
+                        + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt);
 
-            // Stock purchase done
-            // Tell the manager that this store is done purchasing stock
-            addBehaviour(new SendStockPurchaseConfirmationBehaviour(getAgent()));
+                // Stock purchase done
+                // Tell the manager that this store is done purchasing stock
+                addBehaviour(new SendStockPurchaseConfirmationBehaviour(getAgent()));
+            } catch (UnreadableException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -112,7 +196,7 @@ public class StoreAgent extends DFUserAgent {
 
         public SendSaleInfo(Agent a) {
             super(a, MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
-            MessageTemplate.MatchConversationId(MessageType.STORE_SALES_INFO.toString())));
+                    MessageTemplate.MatchConversationId(MessageType.STORE_SALES_INFO.toString())));
         }
 
         @Override
@@ -123,10 +207,10 @@ public class StoreAgent extends DFUserAgent {
         @Override
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
-            
+
             // TODO: decide sale
             SalesInfo si = new SalesInfo(0, 0, type, getAID());
-            
+
             ACLMessage reply = MessageFactory.storeSalesInfoReply(request, si);
 
             return reply;

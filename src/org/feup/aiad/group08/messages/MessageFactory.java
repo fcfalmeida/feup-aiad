@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.StockPurchaseConditions;
+import org.feup.aiad.group08.definitions.StockPurchaseReceipt;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -53,12 +55,12 @@ public class MessageFactory {
         return createReply(from, ACLMessage.INFORM);
     }
 
-    public static ACLMessage purchaseStock(AID receiver) {
-        return createMessage(MessageType.PURCHASE_STOCK, ACLMessage.REQUEST, receiver);
+    public static ACLMessage purchaseStock(AID receiver, int quantity) {
+        return createMessage(MessageType.PURCHASE_STOCK, ACLMessage.REQUEST, quantity, receiver);
     }
 
-    public static ACLMessage purchaseStockReply(ACLMessage from) {
-        return createReply(from, ACLMessage.INFORM);
+    public static ACLMessage purchaseStockReply(ACLMessage from, StockPurchaseReceipt spr) {
+        return createReply(from, ACLMessage.INFORM, spr);
     }
 
     public static ACLMessage confirmStockPurchase(AID receiver) {
@@ -83,5 +85,13 @@ public class MessageFactory {
 
     public static ACLMessage storeSalesInfoReply(ACLMessage from, Serializable content) {
         return createReply(from, ACLMessage.INFORM, content);
+    }
+
+    public static ACLMessage requestStockPurchaseConditions(AID warehouse) {
+        return createMessage(MessageType.REQUEST_STOCK_PURCHASE_CONDITIONS, ACLMessage.REQUEST, warehouse);
+    }
+
+    public static ACLMessage requestStockPurchaseConditionsReply(ACLMessage from, StockPurchaseConditions spc) {
+        return createReply(from, ACLMessage.INFORM, spc);
     }
 }

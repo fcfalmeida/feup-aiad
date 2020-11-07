@@ -8,6 +8,8 @@ public enum MessageType {
     PURCHASE_STOCK("purchase-stock"),
     // Sent by StoreAgent to ManagerAgent when it finishes purchasing stock
     CONFIRM_STOCK_PURCHASE("confirm-stock-purchase"),
+    // Sent by StoreAgent to WarehouseAgent to request stock purchase conditions
+    REQUEST_STOCK_PURCHASE_CONDITIONS("request-stock-purchase-conditions"),
 
     // Sent by ManagerAgent to allow CustomerAgent to purchase item
     AUTHORIZE_ITEM_PURCHASE("authorize-item-purchase"),

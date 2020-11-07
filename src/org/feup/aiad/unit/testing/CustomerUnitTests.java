@@ -33,9 +33,9 @@ public class CustomerUnitTests {
         p = new ProfileImpl();
         container = rt.createAgentContainer(p);
 
-        container.acceptNewAgent("WarehouseTest", new WarehouseAgent()).start();
+        container.acceptNewAgent("WarehouseTest", new WarehouseAgent(null)).start();
 
-        container.acceptNewAgent("StoreTest", new StoreAgent(StoreType.BOOKS)).start();
+        container.acceptNewAgent("StoreTest", new StoreAgent(StoreType.BOOKS, 100)).start();
 
         container.acceptNewAgent("ManagerTest", new ManagerAgent(5)).start();
     }       
