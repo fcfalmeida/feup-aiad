@@ -29,15 +29,16 @@ public class StoreAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -3205276776739404040L;
     private final StoreType type;
-    private float balanceAvailable = 200;
+    private float balanceAvailable;
     private final int stockCapacity;
     private int currentStock;
     // stock sold in each iteration
     private List<Integer> salesHistory = new ArrayList<>();
 
-    public StoreAgent(StoreType type, int stockCapacity) {
+    public StoreAgent(StoreType type, int stockCapacity, int initBalance) {
         this.type = type;
         this.stockCapacity = stockCapacity;
+        balanceAvailable = initBalance;
         addSystemRole(SystemRole.STORE);
     }
 
@@ -107,23 +108,32 @@ public class StoreAgent extends DFUserAgent {
         int salesAverage = calculateSalesAverage();
 
         // Determine the max purchasable quantity according to the model
+        float prevDiscount = 0;
         for (Map.Entry<Integer, Float> quantDiscount : quantityDiscountModel.entrySet()) {
             float unitPriceWithDiscount = spc.getBaseUnitPrice() - (spc.getBaseUnitPrice() * quantDiscount.getValue());
             // Minimum quantity to get discount
             int minQuantity = quantDiscount.getKey();
 
-            // If max quantity is lower than min quantity, that means we can't get the
-            // current
-            // discount so we break the loop
-            if (maxQuantity < minQuantity)
-                break;
-
-            // Purchasable quantity depends on available balance
-            int purchasableQuantity = (int) (balanceAvailable / unitPriceWithDiscount);
+            // Calculate purchasable quantity based on previous discount
+            float unitPriceWithPrevDiscount = spc.getBaseUnitPrice() - (spc.getBaseUnitPrice() * prevDiscount);
+            int purchasableQuantity = (int) (balanceAvailable / unitPriceWithPrevDiscount);
 
             // If balance isn't enough, the new max equals the purchasable quantity
             if (purchasableQuantity < maxQuantity)
                 maxQuantity = purchasableQuantity;
+
+            // If max quantity is lower than min quantity, that means we can't get the
+            // current discount so we break the loop
+            if (maxQuantity < minQuantity)
+                break;
+
+            // Update purchasable quantity with discount
+            purchasableQuantity = (int) (balanceAvailable / unitPriceWithDiscount);
+            System.out.println("Store " + getLocalName() + " purchasable quant = " + purchasableQuantity);
+            // Update max quantity
+            maxQuantity = purchasableQuantity;
+
+            prevDiscount = quantDiscount.getValue();
         }
 
         // Calculate the average between the sales average and the max quantity

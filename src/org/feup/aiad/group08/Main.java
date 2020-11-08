@@ -3,6 +3,8 @@ package org.feup.aiad.group08;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.feup.aiad.group08.agents.AdvertiserAgent;
 import org.feup.aiad.group08.agents.CustomerAgent;
@@ -51,7 +53,7 @@ public class Main {
     }
 
     private static void createWarehouse() throws StaleProxyException {
-        Map<Integer, Float> quantityDiscountModel = new HashMap<>();
+        SortedMap<Integer, Float> quantityDiscountModel = new TreeMap<>();
         quantityDiscountModel.put(10, 0.05f);
         quantityDiscountModel.put(25, 0.08f);
         quantityDiscountModel.put(50, 0.1f);
@@ -61,15 +63,15 @@ public class Main {
     }
 
     private static void createStores() throws StaleProxyException {
-        container.acceptNewAgent("store1", new StoreAgent(StoreType.BOOKS, 100)).start();
-        container.acceptNewAgent("store2", new StoreAgent(StoreType.TECH, 100)).start();
-        container.acceptNewAgent("store3", new StoreAgent(StoreType.CLOTHES, 60)).start();
-        container.acceptNewAgent("store4", new StoreAgent(StoreType.FOOD, 40)).start();
-        container.acceptNewAgent("store5", new StoreAgent(StoreType.FURNITURE, 110)).start();
-        container.acceptNewAgent("store6", new StoreAgent(StoreType.GAMES, 70)).start();
-        container.acceptNewAgent("store7", new StoreAgent(StoreType.BOOKS, 89)).start();
-        container.acceptNewAgent("store8", new StoreAgent(StoreType.TECH, 121)).start();
-        container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38)).start();
+        container.acceptNewAgent("store1", new StoreAgent(StoreType.BOOKS, 100, 500)).start();
+        container.acceptNewAgent("store2", new StoreAgent(StoreType.TECH, 100, 782)).start();
+        container.acceptNewAgent("store3", new StoreAgent(StoreType.CLOTHES, 60, 333)).start();
+        container.acceptNewAgent("store4", new StoreAgent(StoreType.FOOD, 40, 1000)).start();
+        container.acceptNewAgent("store5", new StoreAgent(StoreType.FURNITURE, 110, 653)).start();
+        container.acceptNewAgent("store6", new StoreAgent(StoreType.GAMES, 70, 1234)).start();
+        container.acceptNewAgent("store7", new StoreAgent(StoreType.BOOKS, 89, 555)).start();
+        container.acceptNewAgent("store8", new StoreAgent(StoreType.TECH, 121, 99)).start();
+        container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38, 234)).start();
     }
 
     private static void createCustomers() throws StaleProxyException {
