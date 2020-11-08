@@ -14,6 +14,7 @@ import jade.proto.AchieveREInitiator;
 
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
+import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.utils.Distribution;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
@@ -77,7 +78,17 @@ public class CustomerAgent extends DFUserAgent {
             System.out.println("Customer " + getAgent().getLocalName() + " received sales info from Advertiser");
             try {
                 salesInfo = (Vector<SalesInfo>) msg.getContentObject();
-                // TODO addBehaviour(new PurchaseItemBehaviour())
+                SalesInfo bestItem = decideBestPurchase();
+
+                if (bestItem == null) {
+                    System.out.println("Customer " + getAgent().getLocalName() + " will not purchase anything.");
+                    return;
+                }
+
+                ACLMessage purchaseItemMsg = MessageFactory.purchaseItem( bestItem);
+                
+                addBehaviour(new PurchaseItemBehaviour(getAgent(), purchaseItemMsg));
+                
             } catch (UnreadableException e) {
                 e.printStackTrace();
             }
@@ -107,18 +118,30 @@ public class CustomerAgent extends DFUserAgent {
     }
 
     private SalesInfo decideBestPurchase(){
+        // We need to add the SalesInfoVector from the Advertiser Agent
+        
+        // Map that stores SalesInfo and their respective probabilities
         Map<SalesInfo, Float> preferenceProbs = new HashMap<>();
 
+        // For each SalesInfo calculate its preference probability base on the ranking of the customer
         for (SalesInfo sInfo : salesInfo) {
             float preferenceProb = calculatePreferenceProb(sInfo.storeType());
+            // Here the preference probability is multiplied by the discount and influenceavbility to get the probability of the items getting bought
             preferenceProbs.put(sInfo, preferenceProb * sInfo.discountPercentage() * influenceability);
         }
         
         Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
+        SalesInfo bestItem = salesDist.getRandomEvent(); 
 
-        return salesDist.sample();        
+        // If the customer has no money they can't buy the item
+        if (bestItem.getItemPrice() > balance) {
+            return null;
+        }
+
+        return bestItem;      
     }
 
+    // This method finds the StoreType preference rank of the customer preferences and calculates its probability
     private float calculatePreferenceProb(StoreType preference){
         int index = storePreferences.indexOf(preference);
 
