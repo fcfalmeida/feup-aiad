@@ -87,7 +87,7 @@ public class AdvertiserAgent extends DFUserAgent {
         private static final long serialVersionUID = 16509165843322125L;
 
         public AdvertiseBehaviour(Agent agent) {
-            super(agent, MessageType.ADVERTISER_SALES_INFO, customers.toArray(new AID[0]));
+            super(agent, MessageType.ADVERTISER_SALES_INFO, salesInfo, customers.toArray(new AID[0]));
         }
 
     }
