@@ -7,8 +7,7 @@ public class StockPurchaseReceipt implements Serializable {
     private static final long serialVersionUID = 4017259109385436836L;
     private float unitPrice;
     private int quantity;
-    // This value is merely informative. The unit price already includes the
-    // discount
+    // This value is merely informative. The unit price already includes the discount
     private float appliedDiscount;
     private float totalPrice;
 

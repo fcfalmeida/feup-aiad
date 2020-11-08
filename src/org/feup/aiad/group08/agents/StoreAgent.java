@@ -98,6 +98,12 @@ public class StoreAgent extends DFUserAgent {
         }
     }
 
+    /**
+     * Decides how much stock to purchase based on current stock capcity, available balance
+     * warehouse stock purchase conditions and sales history
+     * @param spc warehouse's stock purchase conditions
+     * @return the amount of stock to purchase
+     */
     private int decidePurchaseQuantity(StockPurchaseConditions spc) {
         Map<Integer, Float> quantityDiscountModel = spc.getQuantityDiscountModel();
 
@@ -130,8 +136,6 @@ public class StoreAgent extends DFUserAgent {
             // Update purchasable quantity with discount
             purchasableQuantity = (int) (balanceAvailable / unitPriceWithDiscount);
 
-            System.out.println("Store " + getLocalName() + " purchasable quant = " + purchasableQuantity);
-            
             // Update max quantity
             maxQuantity = purchasableQuantity;
 
@@ -160,7 +164,6 @@ public class StoreAgent extends DFUserAgent {
             return 0;
 
         float sum = 0;
-
         for (Integer sold : salesHistory)
             sum += sold;
 
