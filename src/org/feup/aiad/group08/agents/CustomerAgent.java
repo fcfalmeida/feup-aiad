@@ -85,7 +85,7 @@ public class CustomerAgent extends DFUserAgent {
                     return;
                 }
 
-                ACLMessage purchaseItemMsg = MessageFactory.purchaseItem( bestItem);
+                ACLMessage purchaseItemMsg = MessageFactory.purchaseItem(bestItem);
                 
                 addBehaviour(new PurchaseItemBehaviour(getAgent(), purchaseItemMsg));
                 
@@ -127,7 +127,9 @@ public class CustomerAgent extends DFUserAgent {
         for (SalesInfo sInfo : salesInfo) {
             float preferenceProb = calculatePreferenceProb(sInfo.storeType());
             // Here the preference probability is multiplied by the discount and influenceavbility to get the probability of the items getting bought
-            preferenceProbs.put(sInfo, preferenceProb * sInfo.discountPercentage() * influenceability);
+            if(preferenceProb > 0) {
+                preferenceProbs.put(sInfo, preferenceProb * sInfo.discountPercentage() * influenceability);
+            }
         }
         
         Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
@@ -144,6 +146,10 @@ public class CustomerAgent extends DFUserAgent {
     // This method finds the StoreType preference rank of the customer preferences and calculates its probability
     private float calculatePreferenceProb(StoreType preference){
         int index = storePreferences.indexOf(preference);
+
+        if(index == -1){
+            return 0f;
+        }
 
         // The last element of storePreferences list has the highest percentage
         return (float)(index + 1)/storePreferences.size();

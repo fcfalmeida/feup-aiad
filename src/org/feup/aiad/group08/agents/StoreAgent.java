@@ -233,7 +233,7 @@ public class StoreAgent extends DFUserAgent {
                 throws FailureException {
 
             // TODO: decide sale
-            currentSale = new SalesInfo(0, 0, type, getAID());
+            currentSale = new SalesInfo(10, 0.1f, type, getAID());
 
             ACLMessage reply = MessageFactory.storeSalesInfoReply(request, currentSale);
 

@@ -2,6 +2,7 @@ package org.feup.aiad.group08;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -74,12 +75,22 @@ public class Main {
         container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38, 234)).start();
     }
 
-    private static void createCustomers() throws StaleProxyException {
-        container.acceptNewAgent("customer1", new CustomerAgent(100, new ArrayList<>())).start();
-        container.acceptNewAgent("customer2", new CustomerAgent(200, new ArrayList<>())).start();
-        container.acceptNewAgent("customer3", new CustomerAgent(10, new ArrayList<>())).start();
-        container.acceptNewAgent("customer4", new CustomerAgent(50, new ArrayList<>())).start();
-        container.acceptNewAgent("customer5", new CustomerAgent(20, new ArrayList<>())).start();;
+    private static void createCustomers() throws StaleProxyException {     
+        List<StoreType> storePreferences1 = new ArrayList<>();
+        storePreferences1.add(StoreType.BOOKS);
+        storePreferences1.add(StoreType.GAMES);
+        storePreferences1.add(StoreType.FOOD);
+
+        List<StoreType> storePreferences2 = new ArrayList<>();
+        storePreferences2.add(StoreType.FURNITURE);
+        storePreferences2.add(StoreType.CLOTHES);
+        storePreferences2.add(StoreType.TECH);
+
+        container.acceptNewAgent("customer1", new CustomerAgent(100, storePreferences1)).start();
+        container.acceptNewAgent("customer2", new CustomerAgent(200, storePreferences1)).start();
+        container.acceptNewAgent("customer3", new CustomerAgent(10, storePreferences2)).start();
+        container.acceptNewAgent("customer4", new CustomerAgent(50, storePreferences2)).start();
+        container.acceptNewAgent("customer5", new CustomerAgent(20, storePreferences1)).start();;
     }
     
     private static void createManager() throws StaleProxyException {

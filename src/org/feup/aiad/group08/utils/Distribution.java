@@ -31,14 +31,20 @@ public class Distribution<T> {
     public T getRandomEvent() {
         
         float randomNumber = rand.nextFloat() * sumProb;
+
+        System.out.println("\nRandom Number:" + randomNumber);
         
         float lowerBound = 0;
 
         for (T eventKey : probsMap.keySet()) {
-            if (lowerBound <= randomNumber && randomNumber <= (lowerBound + probsMap.get(eventKey))){
+            float upperBound = lowerBound + probsMap.get(eventKey);
+            if ((lowerBound <= randomNumber) && (randomNumber <= upperBound)){
+                System.out.println("\nLowerBound:" + lowerBound);
+                System.out.println("\nUpperBound:" + upperBound);
                 return eventKey;
             } else {
             lowerBound += probsMap.get(eventKey);
+            System.out.println("\nElseLowerBound:" + lowerBound);
             }
         }
 
