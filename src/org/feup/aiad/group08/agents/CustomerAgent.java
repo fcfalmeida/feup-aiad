@@ -24,8 +24,8 @@ public class CustomerAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -8345978142167560058L;
 
-    private static final int INFLUENCE_UPPER_LIMIT = 10;
-    private static final int INFLUENCE_LOWER_LIMIT = 1;
+    private static final float INFLUENCE_UPPER_LIMIT = 1f;
+    private static final float INFLUENCE_LOWER_LIMIT = 0.2f;
 
     private float balance; // The total funds availaible for the customer to purchase.
     private float influenceability; // Each agent can be more easily or not influenced by promotions
@@ -62,7 +62,7 @@ public class CustomerAgent extends DFUserAgent {
     // This method generates a random integer between an interval that will define
     // how influentable the costumer is to sales.
     private static float generateInfluenceability() {
-        return new Random().nextInt(INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT + 1) + INFLUENCE_LOWER_LIMIT;
+        return INFLUENCE_LOWER_LIMIT + new Random().nextFloat() * (INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT);
     }
 
     private class ReceiveAdvertisementBehaviour extends ReceiveInformBehaviour {
@@ -140,6 +140,7 @@ public class CustomerAgent extends DFUserAgent {
             return null;
         }
 
+        System.out.println(bestItem);
         return bestItem;      
     }
 
@@ -150,7 +151,7 @@ public class CustomerAgent extends DFUserAgent {
         if(index == -1){
             return 0f;
         }
-
+        
         // The last element of storePreferences list has the highest percentage
         return (float)(index + 1)/storePreferences.size();
     }
