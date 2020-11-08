@@ -34,6 +34,7 @@ public class StoreAgent extends DFUserAgent {
     private int currentStock;
     // stock sold in each iteration
     private List<Integer> salesHistory = new ArrayList<>();
+    private SalesInfo currentSale;
 
     public StoreAgent(StoreType type, int stockCapacity, int initBalance) {
         this.type = type;
@@ -231,12 +232,16 @@ public class StoreAgent extends DFUserAgent {
                 throws FailureException {
 
             // TODO: decide sale
-            SalesInfo si = new SalesInfo(0, 0, type, getAID());
+            currentSale = new SalesInfo(0, 0, type, getAID());
 
-            ACLMessage reply = MessageFactory.storeSalesInfoReply(request, si);
+            ACLMessage reply = MessageFactory.storeSalesInfoReply(request, currentSale);
 
             return reply;
         }
+    }
+
+    private SalesInfo decideCurrentSale() {
+        return null;
     }
 
     private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder {
