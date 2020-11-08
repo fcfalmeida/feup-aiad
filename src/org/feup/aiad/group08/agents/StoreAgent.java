@@ -170,6 +170,8 @@ public class StoreAgent extends DFUserAgent {
                 System.out.println("Store " + getAID().getName()
                         + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt);
 
+                currentStock += receipt.getQuantity();
+
                 // Stock purchase done
                 // Tell the manager that this store is done purchasing stock
                 addBehaviour(new SendStockPurchaseConfirmationBehaviour(getAgent()));
