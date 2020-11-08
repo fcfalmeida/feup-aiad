@@ -84,8 +84,13 @@ public class WarehouseAgent extends DFUserAgent {
 
             System.out.println("Warehouse Received stock purchase request from " + request.getSender().getLocalName());
             
-            StockPurchaseReceipt receipt = new StockPurchaseReceipt(spc.finalUnitPrice(requestedQuantity),
-                    requestedQuantity, spc.appliedDiscount(requestedQuantity));
+            float finalUnitPrice = spc.finalUnitPrice(requestedQuantity);
+            float appliedDiscount = spc.appliedDiscount(requestedQuantity);
+            float totalPrice = finalUnitPrice * requestedQuantity * appliedDiscount;
+            totalPrice = Math.round(totalPrice * 100) / 100;
+
+            StockPurchaseReceipt receipt = new StockPurchaseReceipt(finalUnitPrice,
+                    requestedQuantity, appliedDiscount, totalPrice);
             
             ACLMessage res = MessageFactory.purchaseStockReply(request, receipt);
 

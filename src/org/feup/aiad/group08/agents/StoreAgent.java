@@ -29,7 +29,7 @@ public class StoreAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -3205276776739404040L;
     private final StoreType type;
-    private float balanceAvailable = 5000;
+    private float balanceAvailable = 200;
     private final int stockCapacity;
     private int currentStock;
     // stock sold in each iteration
@@ -166,11 +166,14 @@ public class StoreAgent extends DFUserAgent {
             StockPurchaseReceipt receipt;
             try {
                 receipt = (StockPurchaseReceipt) inform.getContentObject();
-                
-                System.out.println("Store " + getAID().getName()
-                        + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt);
 
                 currentStock += receipt.getQuantity();
+                balanceAvailable -= receipt.getTotalPrice();
+
+                System.out.println("Store " + getAID().getName()
+                        + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt
+                        + "\nCurrent stock: " + currentStock + "/" + stockCapacity + "\nAvailable Balance: "
+                        + balanceAvailable);
 
                 // Stock purchase done
                 // Tell the manager that this store is done purchasing stock
