@@ -49,6 +49,7 @@ public class StoreAgent extends DFUserAgent {
 
         addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this));
         addBehaviour(new SendSaleInfo(this));
+        addBehaviour(new ReceiveItemPurchaseRequestBehaviour(this));
     }
 
     private class ReceiveStockPurchaseAuthorizationBehaviour extends ReceiveInformBehaviour {
@@ -248,8 +249,8 @@ public class StoreAgent extends DFUserAgent {
 
         private static final long serialVersionUID = 1L;
 
-        public ReceiveItemPurchaseRequestBehaviour(Agent a, MessageTemplate mt) {
-            super(a, mt);
+        public ReceiveItemPurchaseRequestBehaviour(Agent a) {
+            super(a, MessageTemplate.MatchConversationId(MessageType.PURCHASE_ITEM.toString()));
         }
 
         @Override
@@ -263,11 +264,7 @@ public class StoreAgent extends DFUserAgent {
             ACLMessage res = request.createReply();
             res.setPerformative(ACLMessage.INFORM);
 
-            System.out.println("Store received item purchase request from " + request.getSender().getName());
-
-            // Waits for another item purchase from other agents
-            addBehaviour(new ReceiveItemPurchaseRequestBehaviour(getAgent(),
-                    MessageTemplate.MatchContent(MessageType.PURCHASE_ITEM.toString())));
+            System.out.println("Store received item purchase request from " + request.getSender().getName());            
 
             return res;
         }

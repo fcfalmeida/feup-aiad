@@ -3,7 +3,9 @@ package org.feup.aiad.group08.messages;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
+import org.feup.aiad.group08.definitions.SalesInfo;
 import org.feup.aiad.group08.definitions.StockPurchaseConditions;
 import org.feup.aiad.group08.definitions.StockPurchaseReceipt;
 
@@ -93,5 +95,13 @@ public class MessageFactory {
 
     public static ACLMessage requestStockPurchaseConditionsReply(ACLMessage from, StockPurchaseConditions spc) {
         return createReply(from, ACLMessage.INFORM, spc);
+    }
+
+    public static ACLMessage purchaseItem(SalesInfo bestItem) {
+        return createMessage(MessageType.PURCHASE_ITEM, ACLMessage.REQUEST, bestItem, bestItem.getStoreName());
+    }
+
+    public static ACLMessage purchaseItemReply(ACLMessage from, ItemPurchaseReceipt ipr) {
+        return createReply(from, ACLMessage.INFORM, ipr);
     }
 }

@@ -1,34 +1,47 @@
 package org.feup.aiad.group08.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-// TODO: Ver melhor isto
+/**
+ * This class is used when we have map of events and their respective probability and we want
+ * to "roll the dice" on those events.
+ */
 public class Distribution<T> {
 
-    List<Float> probs = new ArrayList<>();
-    List<T> events = new ArrayList<>();
     float sumProb;
     Random rand = new Random();
 
-    public Distribution(Map<T, Float> probs) {
+    // (Key set) List of the events that each correspond to one probability
+    // (Value Set) List of the probability values
+    Map<T, Float> probsMap = new HashMap<>();
 
-        for (T event : probs.keySet()) {
-            sumProb += probs.get(event);
-            events.add(event);
-            this.probs.add(probs.get(event));
+    public Distribution(Map<T, Float> probsMap) {
+
+        this.probsMap = probsMap;
+
+        for (T eventKey : probsMap.keySet()) {
+            sumProb += probsMap.get(eventKey);            
         }
     }
 
-    public T sample() {
+    public T getRandomEvent() {
+        
+        float randomNumber = rand.nextFloat() * sumProb;
+        
+        float lowerBound = 0;
 
-        float prob = rand.nextFloat() * sumProb;
-        int i;
-        for (i = 0; prob > 0; i++) {
-            prob -= probs.get(i);
+        for (T eventKey : probsMap.keySet()) {
+            if (lowerBound <= randomNumber && randomNumber <= (lowerBound + probsMap.get(eventKey))){
+                return eventKey;
+            } else {
+            lowerBound += probsMap.get(eventKey);
+            }
         }
-        return events.get(i - 1);
+
+        return null;        
     }
 }
