@@ -86,7 +86,7 @@ public class WarehouseAgent extends DFUserAgent {
             
             float finalUnitPrice = spc.finalUnitPrice(requestedQuantity);
             float appliedDiscount = spc.appliedDiscount(requestedQuantity);
-            float totalPrice = finalUnitPrice * requestedQuantity * appliedDiscount;
+            float totalPrice = (finalUnitPrice * requestedQuantity) - (finalUnitPrice * requestedQuantity * appliedDiscount);
             totalPrice = Math.round(totalPrice * 100) / 100;
 
             StockPurchaseReceipt receipt = new StockPurchaseReceipt(finalUnitPrice,
