@@ -1,15 +1,15 @@
 package org.feup.aiad.group08.definitions;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.SortedMap;
 
 public class StockPurchaseConditions implements Serializable {
     
     private static final long serialVersionUID = 7754417352745743431L;
     private float baseUnitPrice;
-    private Map<Integer, Float> quantityDiscountModel;
+    private SortedMap<Integer, Float> quantityDiscountModel;
 
-    public StockPurchaseConditions(float baseUnitPrice, Map<Integer, Float> quantityDiscountModel) {
+    public StockPurchaseConditions(float baseUnitPrice, SortedMap<Integer, Float> quantityDiscountModel) {
         this.baseUnitPrice = baseUnitPrice;
         this.quantityDiscountModel = quantityDiscountModel;
     }
@@ -18,7 +18,7 @@ public class StockPurchaseConditions implements Serializable {
         return baseUnitPrice;
     }
 
-    public Map<Integer, Float> getQuantityDiscountModel() {
+    public SortedMap<Integer, Float> getQuantityDiscountModel() {
         return quantityDiscountModel;
     }
 
@@ -31,7 +31,7 @@ public class StockPurchaseConditions implements Serializable {
     public float appliedDiscount(int quantity) {
         float discount = 0;
 
-        for (Map.Entry<Integer, Float> quantDiscount : quantityDiscountModel.entrySet()) {
+        for (SortedMap.Entry<Integer, Float> quantDiscount : quantityDiscountModel.entrySet()) {
             if (quantity < quantDiscount.getKey())
                 return discount;
             else   
