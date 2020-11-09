@@ -35,7 +35,7 @@ public class CustomerUnitTests {
 
         container.acceptNewAgent("WarehouseTest", new WarehouseAgent(null)).start();
 
-        container.acceptNewAgent("StoreTest", new StoreAgent(StoreType.BOOKS, 100, 500)).start();
+        container.acceptNewAgent("StoreTest", new StoreAgent(StoreType.BOOKS, 100, 500, .1f, .40f)).start();
 
         container.acceptNewAgent("ManagerTest", new ManagerAgent(5)).start();
     }       
