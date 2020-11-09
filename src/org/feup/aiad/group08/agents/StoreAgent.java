@@ -3,9 +3,11 @@ package org.feup.aiad.group08.agents;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.Profile;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
@@ -24,6 +26,7 @@ import org.feup.aiad.group08.definitions.StockPurchaseReceipt;
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
+import org.feup.aiad.group08.utils.Utils;
 
 public class StoreAgent extends DFUserAgent {
 
@@ -32,14 +35,24 @@ public class StoreAgent extends DFUserAgent {
     private float balanceAvailable;
     private final int stockCapacity;
     private int currentStock;
+    // Bare minimum profit margin that the store should try to get
+    private float minProfitMargin;
+    // Target profit margin. The actual profit margin won't reach this value most
+    // of the times because of discounts
+    private float desiredProfitMargin;
     // stock sold in each iteration
     private List<Integer> salesHistory = new ArrayList<>();
     private SalesInfo currentSale;
+    // ongoing sales in all stores
+    private Vector<SalesInfo> allSales = new Vector<>();
 
-    public StoreAgent(StoreType type, int stockCapacity, int initBalance) {
+    public StoreAgent(StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
+            float desiredProfitMargin) {
         this.type = type;
         this.stockCapacity = stockCapacity;
         balanceAvailable = initBalance;
+        this.minProfitMargin = minProfitMargin;
+        this.desiredProfitMargin = desiredProfitMargin;
         addSystemRole(SystemRole.STORE);
     }
 
@@ -101,8 +114,9 @@ public class StoreAgent extends DFUserAgent {
     }
 
     /**
-     * Decides how much stock to purchase based on current stock capcity, available balance
-     * warehouse stock purchase conditions and sales history
+     * Decides how much stock to purchase based on current stock capcity, available
+     * balance warehouse stock purchase conditions and sales history
+     * 
      * @param spc warehouse's stock purchase conditions
      * @return the amount of stock to purchase
      */
@@ -144,7 +158,8 @@ public class StoreAgent extends DFUserAgent {
         // Calculate the average between the sales average and the max quantity
         // calculated previously. Then take away the current stock to determine
         // the quantity that should be purchased to achieve target quantity
-        // Math.min is used here to prevent the store from purchasing more stock than it can store
+        // Math.min is used here to prevent the store from purchasing more stock than it
+        // can store
 
         int currentStockCapacity = stockCapacity - currentStock;
         // Average sales in the past
@@ -161,8 +176,7 @@ public class StoreAgent extends DFUserAgent {
                 quantity = purchasableQuantity;
 
             return Math.min(quantity, currentStockCapacity);
-        }
-        else
+        } else
             return Math.min(maxQuantity, currentStockCapacity);
     }
 
@@ -181,6 +195,25 @@ public class StoreAgent extends DFUserAgent {
             sum += sold;
 
         return (int) Math.floor(sum / salesHistory.size());
+    }
+
+    private class ReceiveAdvertisementBehaviour extends ReceiveInformBehaviour {
+
+        private static final long serialVersionUID = -8738578803449796409L;
+
+        public ReceiveAdvertisementBehaviour(Agent agent) {
+            super(agent, MessageType.ADVERTISER_SALES_INFO);
+        }
+
+        @Override
+        public void processMessage(ACLMessage msg) {
+            System.out.println("Store " + getAgent().getLocalName() + " received sales info from Advertiser");
+            try {
+                allSales = (Vector<SalesInfo>) msg.getContentObject();
+            } catch (UnreadableException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private class PurchaseStockBehaviour extends AchieveREInitiator {
@@ -204,6 +237,8 @@ public class StoreAgent extends DFUserAgent {
                         + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt
                         + "\nCurrent stock: " + currentStock + "/" + stockCapacity + "\nAvailable Balance: "
                         + balanceAvailable);
+
+                currentSale = decideCurrentSale(receipt.getUnitPrice());
 
                 // Stock purchase done
                 // Tell the manager that this store is done purchasing stock
@@ -243,17 +278,37 @@ public class StoreAgent extends DFUserAgent {
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
 
-            // TODO: decide sale
-            currentSale = new SalesInfo(10, 0.1f, type, getAID());
-
             ACLMessage reply = MessageFactory.storeSalesInfoReply(request, currentSale);
 
             return reply;
         }
     }
 
-    private SalesInfo decideCurrentSale() {
-        return null;
+    private SalesInfo decideCurrentSale(float purchasePrice) {
+        float sellingPrice = purchasePrice + purchasePrice * desiredProfitMargin;
+        float bestDiscount = SalesInfo.bestDiscount(purchasePrice, sellingPrice, minProfitMargin);
+        float sellingPriceWithDiscount = Utils.applyDiscount(sellingPrice, bestDiscount);
+
+        SalesInfo si = new SalesInfo(sellingPriceWithDiscount, bestDiscount, type, getAID());
+
+        return si;
+    }
+
+    /**
+     * Goes through the allSales list and returns the sales whose store type is the
+     * same as this store
+     * 
+     * @return sales info of competitors
+     */
+    private List<SalesInfo> getCompetitors() {
+        List<SalesInfo> competitors = new ArrayList<>();
+
+        for (SalesInfo salesInfo : allSales) {
+            if (salesInfo.storeType() == type)
+                competitors.add(salesInfo);
+        }
+
+        return competitors;
     }
 
     private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder {
@@ -275,7 +330,7 @@ public class StoreAgent extends DFUserAgent {
             ACLMessage res = request.createReply();
             res.setPerformative(ACLMessage.INFORM);
 
-            System.out.println("Store received item purchase request from " + request.getSender().getName());            
+            System.out.println("Store received item purchase request from " + request.getSender().getName());
 
             return res;
         }

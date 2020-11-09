@@ -2,12 +2,17 @@ package org.feup.aiad.group08.definitions;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Random;
+
+import org.feup.aiad.group08.utils.Utils;
 
 import jade.core.AID;
 
 public class SalesInfo implements Serializable {
 
     private static final long serialVersionUID = -6234236657351857452L;
+    private static final float[] possibleDiscounts = new float[] {.1f, .2f, .3f, .4f, .5f, .6f};
+
     // Item price already includes discount
     private float itemPrice;
     private float discountPercentage;
@@ -15,7 +20,7 @@ public class SalesInfo implements Serializable {
     private AID storeName;
 
     public SalesInfo(float itemPrice, float discountPercentage, StoreType storeType, AID storeName) {
-        this.itemPrice = itemPrice;
+        this.itemPrice = Utils.formatPrice(itemPrice);
         this.discountPercentage = discountPercentage;
         this.storeType = storeType;
         this.storeName = storeName;
@@ -50,5 +55,33 @@ public class SalesInfo implements Serializable {
     public String toString() {
         return storeName.getLocalName() + "(" + storeType + ") - " + "Item Price: " + itemPrice + " | Discount: "
                 + discountPercentage;
+    }
+
+    public static float randomDiscount() {
+        int randomIndex = new Random().nextInt(possibleDiscounts.length);
+
+        return possibleDiscounts[randomIndex];
+    }
+
+    /**
+     * Given a purchase and a selling price, returns the highest possible discount
+     * that still respects the minimum profit margin
+     * @param purchasePrice purchase price
+     * @param sellingPrice selling price
+     * @param minProfitMargin minimum profit margin
+     * @return the best possible discount
+     */
+    public static float bestDiscount(float purchasePrice, float sellingPrice, float minProfitMargin) {
+        float bestDiscount = 0;
+
+        for (float discount : possibleDiscounts) {
+            float sellingPriceWithDiscount = Utils.applyDiscount(sellingPrice, discount);
+            float profitMargin = Utils.calculateProfitMargin(purchasePrice, sellingPriceWithDiscount);
+
+            if (profitMargin >= minProfitMargin)
+                bestDiscount = discount;
+        }
+
+        return bestDiscount;
     }
 }
