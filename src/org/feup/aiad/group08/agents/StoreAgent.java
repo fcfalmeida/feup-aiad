@@ -112,9 +112,6 @@ public class StoreAgent extends DFUserAgent {
         // Initialize max quantity with current stock capacity
         int maxQuantity = stockCapacity - currentStock;
 
-        // Average sales in the past
-        int salesAverage = calculateSalesAverage();
-
         // Determine the max purchasable quantity according to the model
         float prevDiscount = 0;
         for (Map.Entry<Integer, Float> quantDiscount : quantityDiscountModel.entrySet()) {
@@ -148,9 +145,23 @@ public class StoreAgent extends DFUserAgent {
         // calculated previously. Then take away the current stock to determine
         // the quantity that should be purchased to achieve target quantity
         // Math.min is used here to prevent the store from purchasing more stock than it can store
+
         int currentStockCapacity = stockCapacity - currentStock;
-        if (salesAverage > 0)
-            return Math.min((salesAverage + maxQuantity) / 2 - currentStock, currentStockCapacity);
+        // Average sales in the past
+        int salesAverage = calculateSalesAverage();
+
+        if (salesAverage > 0) {
+            // Quantity left to reach target (sales average)
+            int quantity = salesAverage - currentStockCapacity;
+            quantity = (quantity + maxQuantity) / 2;
+
+            int purchasableQuantity = (int) (balanceAvailable / spc.finalUnitPrice(quantity));
+
+            if (purchasableQuantity < quantity)
+                quantity = purchasableQuantity;
+
+            return Math.min(quantity, currentStockCapacity);
+        }
         else
             return Math.min(maxQuantity, currentStockCapacity);
     }

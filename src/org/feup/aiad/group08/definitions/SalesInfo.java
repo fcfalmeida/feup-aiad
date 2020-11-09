@@ -8,6 +8,7 @@ import jade.core.AID;
 public class SalesInfo implements Serializable {
 
     private static final long serialVersionUID = -6234236657351857452L;
+    // Item price already includes discount
     private float itemPrice;
     private float discountPercentage;
     private StoreType storeType;
