@@ -64,15 +64,15 @@ public class Main {
     }
 
     private static void createStores() throws StaleProxyException {
-        container.acceptNewAgent("store1", new StoreAgent(StoreType.BOOKS, 100, 500, .15f, .4f)).start();
-        container.acceptNewAgent("store2", new StoreAgent(StoreType.TECH, 100, 782, .2f, .4f)).start();
-        container.acceptNewAgent("store3", new StoreAgent(StoreType.CLOTHES, 60, 333, .2f, .4f)).start();
-        container.acceptNewAgent("store4", new StoreAgent(StoreType.FOOD, 40, 1000, .18f, .4f)).start();
-        container.acceptNewAgent("store5", new StoreAgent(StoreType.FURNITURE, 110, 653, .22f, .45f)).start();
-        container.acceptNewAgent("store6", new StoreAgent(StoreType.GAMES, 70, 1234, .25f, .45f)).start();
-        container.acceptNewAgent("store7", new StoreAgent(StoreType.BOOKS, 89, 555, .2f, .45f)).start();
-        container.acceptNewAgent("store8", new StoreAgent(StoreType.TECH, 121, 99, .17f, .45f)).start();
-        container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38, 234, .18f, .45f)).start();
+        // container.acceptNewAgent("store1", new StoreAgent(StoreType.BOOKS, 100, 500, .15f, .4f)).start();
+        // container.acceptNewAgent("store2", new StoreAgent(StoreType.TECH, 100, 782, .2f, .4f)).start();
+        // container.acceptNewAgent("store3", new StoreAgent(StoreType.CLOTHES, 60, 333, .2f, .4f)).start();
+        // container.acceptNewAgent("store4", new StoreAgent(StoreType.FOOD, 40, 1000, .18f, .4f)).start();
+        // container.acceptNewAgent("store5", new StoreAgent(StoreType.FURNITURE, 110, 653, .22f, .45f)).start();
+        // container.acceptNewAgent("store6", new StoreAgent(StoreType.GAMES, 70, 1234, .25f, .45f)).start();
+        // container.acceptNewAgent("store7", new StoreAgent(StoreType.BOOKS, 89, 555, .2f, .45f)).start();
+        // container.acceptNewAgent("store8", new StoreAgent(StoreType.TECH, 121, 99, .17f, .45f)).start();
+        // container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38, 234, .18f, .45f)).start();
     }
 
     private static void createCustomers() throws StaleProxyException {     
