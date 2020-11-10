@@ -11,7 +11,8 @@ import jade.core.AID;
 public class SalesInfo implements Serializable {
 
     private static final long serialVersionUID = -6234236657351857452L;
-    private static final float[] possibleDiscounts = new float[] {.1f, .2f, .3f, .4f, .5f, .6f};
+    private static final float[] possibleDiscounts = new float[] { .05f, .1f, .15f, .2f, .25f, .3f, .35f, .4f, .45f,
+            .5f, .55f, .6f };
 
     // Item price already includes discount
     private float itemPrice;
@@ -66,8 +67,9 @@ public class SalesInfo implements Serializable {
     /**
      * Given a purchase and a selling price, returns the highest possible discount
      * that still respects the minimum profit margin
-     * @param purchasePrice purchase price
-     * @param sellingPrice selling price
+     * 
+     * @param purchasePrice   purchase price
+     * @param sellingPrice    selling price
      * @param minProfitMargin minimum profit margin
      * @return the best possible discount
      */
