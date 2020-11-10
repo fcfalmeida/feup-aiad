@@ -16,6 +16,7 @@ import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.utils.Distribution;
+import org.feup.aiad.group08.utils.Utils;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
@@ -33,12 +34,12 @@ public class CustomerAgent extends DFUserAgent {
 
     private List<SalesInfo> salesInfo = new Vector<>();
 
-    public CustomerAgent(float initBalance, List<StoreType> storePreferences) {
+    public CustomerAgent(float initBalance, List<StoreType> storePreferences, float influenceability) {
         addSystemRole(SystemRole.CUSTOMER);
 
         balance = initBalance;
         this.storePreferences = storePreferences;
-        influenceability = generateInfluenceability();
+        this.influenceability = influenceability;
     }
 
     @Override
@@ -133,8 +134,8 @@ public class CustomerAgent extends DFUserAgent {
             }
         }
         
-        Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
-        SalesInfo bestItem = salesDist.getRandomEvent(); 
+        //Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
+        SalesInfo bestItem = Utils.highestEntry(preferenceProbs);
 
         // If the customer has no money they can't buy the item
         if (bestItem.getItemPrice() > balance) {

@@ -32,7 +32,7 @@ public class SalesInfo implements Serializable {
     }
 
     public float discountPercentage() {
-        return itemPrice;
+        return discountPercentage;
     }
 
     public StoreType storeType() {

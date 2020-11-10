@@ -1,5 +1,7 @@
 package org.feup.aiad.group08.utils;
 
+import java.util.Map;
+
 public class Utils {
 
     public static void sleep(int millis) {
@@ -38,5 +40,19 @@ public class Utils {
      */
     public static float roundTo2Decimals(float value) {
         return (float) Math.round(value * 100f) / 100f;
+    }
+
+    public static <K,V extends Comparable<V>> K highestEntry(Map<K,V> map){
+
+        K highestKey = null;
+        V highestValue = null;
+
+        for( Map.Entry<K, V> entry : map.entrySet()){
+            if(entry.getValue().compareTo(highestValue) > 0){
+                highestValue = entry.getValue();
+                highestKey = entry.getKey();
+            }
+        }
+        return highestKey;
     }
 }
