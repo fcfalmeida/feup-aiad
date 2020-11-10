@@ -4,14 +4,18 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+
+import org.feup.aiad.group08.csvManager.parsers.Parser;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class CSVReader {
+public class CSVReader<T> {
 
     private String fileToReadName;
     private  String delimiter;
     private List<List<String>> data;
+    private Parser<T> parser;
 
     /**
      * This constructor reads every line of the csv and stores the values of the
@@ -23,10 +27,11 @@ public class CSVReader {
      *                       lines of the csv
      * @throws IOException
      */
-    public CSVReader(String fileToReadName, String delimiter) throws IOException {
+    public CSVReader(String fileToReadName, String delimiter, Parser<T> parser) throws IOException {
 
         this.fileToReadName = fileToReadName;
         this.delimiter = delimiter;
+        this.parser = parser;
 
         this.data = new ArrayList<>();
 
@@ -50,5 +55,14 @@ public class CSVReader {
 
     public List<List<String>> getData(){
         return data;
+    }
+
+    public List<T> parseData() {
+        List<T> parsedData = new ArrayList<>();
+
+        for (List<String> line : data)
+            parsedData.add(parser.parseLine(line));
+
+        return parsedData;
     }
 }
