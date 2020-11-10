@@ -28,15 +28,17 @@ public class CustomerAgent extends DFUserAgent {
     private static final float INFLUENCE_UPPER_LIMIT = 1f;
     private static final float INFLUENCE_LOWER_LIMIT = 0.2f;
 
+    private String customerName;
     private float balance; // The total funds availaible for the customer to purchase.
     private float influenceability; // Each agent can be more easily or not influenced by promotions
     private List<StoreType> storePreferences;
 
     private List<SalesInfo> salesInfo = new Vector<>();
 
-    public CustomerAgent(float initBalance, List<StoreType> storePreferences, float influenceability) {
+    public CustomerAgent(String customerName,float initBalance, List<StoreType> storePreferences, float influenceability) {
         addSystemRole(SystemRole.CUSTOMER);
 
+        this.customerName = customerName;
         balance = initBalance;
         this.storePreferences = storePreferences;
         this.influenceability = influenceability;
@@ -46,6 +48,10 @@ public class CustomerAgent extends DFUserAgent {
     protected void setup() {
         super.setup();
         addBehaviour(new ReceiveAdvertisementBehaviour(this));
+    }
+
+    public String getCustomerName(){
+        return customerName;
     }
 
     public float getBalance() {
