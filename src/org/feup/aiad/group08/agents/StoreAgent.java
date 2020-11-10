@@ -335,4 +335,8 @@ public class StoreAgent extends DFUserAgent {
             return res;
         }
     }
+
+    public StoreType getType() {
+        return type;
+    }
 }
