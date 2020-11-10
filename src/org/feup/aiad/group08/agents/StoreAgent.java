@@ -32,6 +32,7 @@ import org.feup.aiad.group08.utils.Utils;
 public class StoreAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -3205276776739404040L;
+    private final String storeName;
     private final StoreType type;
     private float balanceAvailable;
     private final int stockCapacity;
@@ -47,8 +48,9 @@ public class StoreAgent extends DFUserAgent {
     // ongoing sales in all stores
     private Vector<SalesInfo> allSales = new Vector<>();
 
-    public StoreAgent(StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
+    public StoreAgent(String storeName,StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
+        this.storeName = storeName;      
         this.type = type;
         this.stockCapacity = stockCapacity;
         balanceAvailable = initBalance;
