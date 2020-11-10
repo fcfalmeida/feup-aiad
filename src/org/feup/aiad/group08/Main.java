@@ -86,11 +86,11 @@ public class Main {
         storePreferences2.add(StoreType.CLOTHES);
         storePreferences2.add(StoreType.TECH);
 
-        container.acceptNewAgent("customer1", new CustomerAgent(100, storePreferences1)).start();
-        container.acceptNewAgent("customer2", new CustomerAgent(200, storePreferences1)).start();
-        container.acceptNewAgent("customer3", new CustomerAgent(10, storePreferences2)).start();
-        container.acceptNewAgent("customer4", new CustomerAgent(50, storePreferences2)).start();
-        container.acceptNewAgent("customer5", new CustomerAgent(20, storePreferences1)).start();;
+        container.acceptNewAgent("customer1", new CustomerAgent(100, storePreferences1, 1f)).start();
+        container.acceptNewAgent("customer2", new CustomerAgent(200, storePreferences1, 1f)).start();
+        container.acceptNewAgent("customer3", new CustomerAgent(10, storePreferences2, 1f)).start();
+        container.acceptNewAgent("customer4", new CustomerAgent(50, storePreferences2, .5f)).start();
+        container.acceptNewAgent("customer5", new CustomerAgent(20, storePreferences1, .8f)).start();;
     }
     
     private static void createManager() throws StaleProxyException {
