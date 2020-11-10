@@ -19,6 +19,7 @@ import jade.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 import org.feup.aiad.group08.definitions.StockPurchaseConditions;
@@ -31,6 +32,7 @@ import org.feup.aiad.group08.utils.Utils;
 public class StoreAgent extends DFUserAgent {
 
     private static final long serialVersionUID = -3205276776739404040L;
+    private final String storeName;
     private final StoreType type;
     private float balanceAvailable;
     private final int stockCapacity;
@@ -46,8 +48,9 @@ public class StoreAgent extends DFUserAgent {
     // ongoing sales in all stores
     private Vector<SalesInfo> allSales = new Vector<>();
 
-    public StoreAgent(StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
+    public StoreAgent(String storeName,StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
+        this.storeName = storeName;      
         this.type = type;
         this.stockCapacity = stockCapacity;
         balanceAvailable = initBalance;
@@ -327,8 +330,12 @@ public class StoreAgent extends DFUserAgent {
         @Override
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
-            ACLMessage res = request.createReply();
-            res.setPerformative(ACLMessage.INFORM);
+
+            ItemPurchaseReceipt receipt = new ItemPurchaseReceipt(currentSale.getItemPrice());
+            ACLMessage res = MessageFactory.purchaseItemReply(request, receipt);
+
+            currentStock--;
+            balanceAvailable += receipt.getItemPrice();
 
             System.out.println("Store received item purchase request from " + request.getSender().getName());
 
