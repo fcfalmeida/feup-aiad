@@ -19,6 +19,7 @@ import jade.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 import org.feup.aiad.group08.definitions.StockPurchaseConditions;
@@ -327,8 +328,12 @@ public class StoreAgent extends DFUserAgent {
         @Override
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
-            ACLMessage res = request.createReply();
-            res.setPerformative(ACLMessage.INFORM);
+
+            ItemPurchaseReceipt receipt = new ItemPurchaseReceipt(currentSale.getItemPrice());
+            ACLMessage res = MessageFactory.purchaseItemReply(request, receipt);
+
+            currentStock--;
+            balanceAvailable += receipt.getItemPrice();
 
             System.out.println("Store received item purchase request from " + request.getSender().getName());
 
