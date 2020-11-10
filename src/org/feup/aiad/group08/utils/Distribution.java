@@ -26,16 +26,34 @@ public class Distribution<T> {
         for (T eventKey : probsMap.keySet()) {
             sumProb += probsMap.get(eventKey);            
         }
+
+        // This iteration normalizes the probabilities to be between 0 and 1.
+        for (T eventKey : probsMap.keySet()) {
+            probsMap.put(eventKey, probsMap.get(eventKey)/sumProb);
+        }
     }
 
+    // TODO: Tirar prints
     public T getRandomEvent() {
         
-        float randomNumber = rand.nextFloat() * sumProb;
+        float randomNumber = rand.nextFloat();
 
         System.out.println("\nRandom Number:" + randomNumber);
         
-        float lowerBound = 0;
+        //float lowerBound = 0;
+        float absDiff = 1;
+        float absDiffMin = 1;
+        T randomEvent = null;
 
+        for (T eventKey : probsMap.keySet()) {
+            absDiff = Math.abs((randomNumber - probsMap.get(eventKey)));
+            if(absDiff <= absDiffMin){
+                absDiffMin = absDiff;
+                randomEvent = eventKey;
+            }            
+        }
+
+        /*
         for (T eventKey : probsMap.keySet()) {
             float upperBound = lowerBound + probsMap.get(eventKey);
             if ((lowerBound <= randomNumber) && (randomNumber <= upperBound)){
@@ -46,8 +64,8 @@ public class Distribution<T> {
             lowerBound += probsMap.get(eventKey);
             System.out.println("\nElseLowerBound:" + lowerBound);
             }
-        }
+        }*/
 
-        return null;        
+        return randomEvent;     
     }
 }

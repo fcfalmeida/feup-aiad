@@ -127,6 +127,7 @@ public class CustomerAgent extends DFUserAgent {
         for (SalesInfo sInfo : salesInfo) {
             float preferenceProb = calculatePreferenceProb(sInfo.storeType());
             // Here the preference probability is multiplied by the discount and influenceavbility to get the probability of the items getting bought
+            // These aren't actually probabilities and should be called weights because the values can be bigger than 1.
             if(preferenceProb > 0) {
                 preferenceProbs.put(sInfo, preferenceProb * sInfo.discountPercentage() * influenceability);
             }
