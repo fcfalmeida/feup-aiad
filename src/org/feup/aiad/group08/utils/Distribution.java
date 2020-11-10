@@ -33,7 +33,6 @@ public class Distribution<T> {
         }
     }
 
-    // TODO: Tirar prints
     public T getRandomEvent() {
         
         float randomNumber = rand.nextFloat();
@@ -52,20 +51,6 @@ public class Distribution<T> {
                 randomEvent = eventKey;
             }            
         }
-
-        /*
-        for (T eventKey : probsMap.keySet()) {
-            float upperBound = lowerBound + probsMap.get(eventKey);
-            if ((lowerBound <= randomNumber) && (randomNumber <= upperBound)){
-                System.out.println("\nLowerBound:" + lowerBound);
-                System.out.println("\nUpperBound:" + upperBound);
-                return eventKey;
-            } else {
-            lowerBound += probsMap.get(eventKey);
-            System.out.println("\nElseLowerBound:" + lowerBound);
-            }
-        }*/
-
         return randomEvent;     
     }
 }
