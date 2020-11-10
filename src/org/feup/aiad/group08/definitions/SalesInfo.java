@@ -20,7 +20,7 @@ public class SalesInfo implements Serializable {
     private AID storeName;
 
     public SalesInfo(float itemPrice, float discountPercentage, StoreType storeType, AID storeName) {
-        this.itemPrice = Utils.formatPrice(itemPrice);
+        this.itemPrice = Utils.roundTo2Decimals(itemPrice);
         this.discountPercentage = discountPercentage;
         this.storeType = storeType;
         this.storeName = storeName;

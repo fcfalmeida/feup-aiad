@@ -18,7 +18,7 @@ public class Utils {
      */
     public static float calculateProfitMargin(float buyingPrice, float sellingPrice) {
         float profitMargin = (sellingPrice - buyingPrice) / sellingPrice;
-        return Utils.formatpercentage(profitMargin);
+        return Utils.roundTo2Decimals(profitMargin);
     }
 
     /**
@@ -32,20 +32,11 @@ public class Utils {
     }
 
     /**
-     * Rounds a price to 2 decimal places
-     * @param price price
-     * @return price rounded to 2 decimal places
+     * Rounds a value to 2 decimal places
+     * @param value value
+     * @return value rounded to 2 decimal places
      */
-    public static float formatPrice(float price) {
-        return Math.round(price * 100) / 100;
-    }
-
-    /**
-     * Rounds a percentage to 2 decimal places
-     * @param percentage percentage
-     * @return percentage rounded to 2 decimal places
-     */
-    public static float formatpercentage(float percentage) {
-        return Math.round(percentage * 100) / 100;
+    public static float roundTo2Decimals(float value) {
+        return (float) Math.round(value * 100f) / 100f;
     }
 }
