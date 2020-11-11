@@ -89,7 +89,6 @@ public class AdvertiserAgent extends DFUserAgent {
         public AdvertiseBehaviour(Agent agent) {
             super(agent, MessageType.ADVERTISER_SALES_INFO, salesInfo);
             receivers.addAll(customers);
-            receivers.addAll(stores);
         }
 
     }

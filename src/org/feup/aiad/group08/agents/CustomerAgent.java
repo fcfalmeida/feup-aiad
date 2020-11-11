@@ -111,13 +111,14 @@ public class CustomerAgent extends DFUserAgent {
         
         private static final long serialVersionUID = 1L;
 
-        // Wait for sales from AdvertiserAgent
-
-        // Choose best item from the list of items
-
         public PurchaseItemBehaviour(Agent a, ACLMessage msg) {
 			super(a, msg);
-		}
+        }
+        
+        @Override
+        protected void handleRefuse(ACLMessage refuse) {
+            System.out.println("Customer " + customerName + " couldn't purchase the item because it is out of stock");
+        }
 		
         @Override
         protected void handleInform(ACLMessage inform) {

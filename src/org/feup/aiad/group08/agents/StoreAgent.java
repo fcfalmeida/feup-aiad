@@ -45,8 +45,6 @@ public class StoreAgent extends DFUserAgent {
     // stock sold in each iteration
     private List<Integer> salesHistory = new ArrayList<>();
     private SalesInfo currentSale;
-    // ongoing sales in all stores
-    private Vector<SalesInfo> allSales = new Vector<>();
 
     public StoreAgent(String storeName,StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
@@ -200,25 +198,6 @@ public class StoreAgent extends DFUserAgent {
         return (int) Math.floor(sum / salesHistory.size());
     }
 
-    private class ReceiveAdvertisementBehaviour extends ReceiveInformBehaviour {
-
-        private static final long serialVersionUID = -8738578803449796409L;
-
-        public ReceiveAdvertisementBehaviour(Agent agent) {
-            super(agent, MessageType.ADVERTISER_SALES_INFO);
-        }
-
-        @Override
-        public void processMessage(ACLMessage msg) {
-            System.out.println("Store " + getAgent().getLocalName() + " received sales info from Advertiser");
-            try {
-                allSales = (Vector<SalesInfo>) msg.getContentObject();
-            } catch (UnreadableException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private class PurchaseStockBehaviour extends AchieveREInitiator {
 
         private static final long serialVersionUID = -7327353955455573704L;
@@ -288,30 +267,17 @@ public class StoreAgent extends DFUserAgent {
     }
 
     private SalesInfo decideCurrentSale(float purchasePrice) {
-        float sellingPrice = purchasePrice + purchasePrice * desiredProfitMargin;
-        float bestDiscount = SalesInfo.bestDiscount(purchasePrice, sellingPrice, minProfitMargin);
-        float sellingPriceWithDiscount = Utils.applyDiscount(sellingPrice, bestDiscount);
-
-        SalesInfo si = new SalesInfo(sellingPriceWithDiscount, bestDiscount, type, getAID());
-
-        return si;
-    }
-
-    /**
-     * Goes through the allSales list and returns the sales whose store type is the
-     * same as this store
-     * 
-     * @return sales info of competitors
-     */
-    private List<SalesInfo> getCompetitors() {
-        List<SalesInfo> competitors = new ArrayList<>();
-
-        for (SalesInfo salesInfo : allSales) {
-            if (salesInfo.storeType() == type)
-                competitors.add(salesInfo);
+        if (currentStock > 0) {
+            float sellingPrice = purchasePrice + purchasePrice * desiredProfitMargin;
+            float bestDiscount = SalesInfo.bestDiscount(purchasePrice, sellingPrice, minProfitMargin);
+            float sellingPriceWithDiscount = Utils.applyDiscount(sellingPrice, bestDiscount);
+    
+            SalesInfo si = new SalesInfo(sellingPriceWithDiscount, bestDiscount, type, getAID());
+    
+            return si;
+        } else {
+            return new SalesInfo(0, 0, type, getAID());
         }
-
-        return competitors;
     }
 
     private class ReceiveItemPurchaseRequestBehaviour extends AchieveREResponder {
@@ -324,7 +290,14 @@ public class StoreAgent extends DFUserAgent {
 
         @Override
         protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
-            return null;
+            if (currentStock > 0) {
+                ACLMessage agree = request.createReply();
+                agree.setPerformative(ACLMessage.AGREE);
+
+                return agree;
+            }
+
+            throw new RefuseException("Store " + storeName + " is out of stock");
         }
 
         @Override
