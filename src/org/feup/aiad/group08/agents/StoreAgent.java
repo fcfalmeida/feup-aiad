@@ -346,4 +346,8 @@ public class StoreAgent extends DFUserAgent {
     public StoreType getType() {
         return type;
     }
+
+    public String getStoreName(){
+        return storeName;
+    }
 }

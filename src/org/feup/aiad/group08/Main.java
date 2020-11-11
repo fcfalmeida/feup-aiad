@@ -85,18 +85,8 @@ public class Main {
         List<List<String>> storesData = csvreader.getData();
         for (List<String> line : storesData) {
             StoreAgent store = parser.parseLine(line);
-            container.acceptNewAgent(store.getName(), store).start();
+            container.acceptNewAgent(store.getStoreName(), store).start();
         }
-
-        // container.acceptNewAgent("store1", new StoreAgent(StoreType.BOOKS, 100, 500, .15f, .4f)).start();
-        // container.acceptNewAgent("store2", new StoreAgent(StoreType.TECH, 100, 782, .2f, .4f)).start();
-        // container.acceptNewAgent("store3", new StoreAgent(StoreType.CLOTHES, 60, 333, .2f, .4f)).start();
-        // container.acceptNewAgent("store4", new StoreAgent(StoreType.FOOD, 40, 1000, .18f, .4f)).start();
-        // container.acceptNewAgent("store5", new StoreAgent(StoreType.FURNITURE, 110, 653, .22f, .45f)).start();
-        // container.acceptNewAgent("store6", new StoreAgent(StoreType.GAMES, 70, 1234, .25f, .45f)).start();
-        // container.acceptNewAgent("store7", new StoreAgent(StoreType.BOOKS, 89, 555, .2f, .45f)).start();
-        // container.acceptNewAgent("store8", new StoreAgent(StoreType.TECH, 121, 99, .17f, .45f)).start();
-        // container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38, 234, .18f, .45f)).start();
     }
 
     private static void createCustomers() throws StaleProxyException {  
@@ -115,24 +105,8 @@ public class Main {
         List<List<String>> customersData = csvreader.getData();
         for (List<String> line : customersData) {
             CustomerAgent customer = parser.parseLine(line);
-            container.acceptNewAgent(customer.getName(), customer).start();
+            container.acceptNewAgent(customer.getCustomerName(), customer).start();
         }
-    
-        // List<StoreType> storePreferences1 = new ArrayList<>();
-        // storePreferences1.add(StoreType.BOOKS);
-        // storePreferences1.add(StoreType.GAMES);
-        // storePreferences1.add(StoreType.FOOD);
-
-        // List<StoreType> storePreferences2 = new ArrayList<>();
-        // storePreferences2.add(StoreType.FURNITURE);
-        // storePreferences2.add(StoreType.CLOTHES);
-        // storePreferences2.add(StoreType.TECH);
-
-        // container.acceptNewAgent("customer1", new CustomerAgent(100, storePreferences1, 1f)).start();
-        // container.acceptNewAgent("customer2", new CustomerAgent(200, storePreferences1, 1f)).start();
-        // container.acceptNewAgent("customer3", new CustomerAgent(10, storePreferences2, 1f)).start();
-        // container.acceptNewAgent("customer4", new CustomerAgent(50, storePreferences2, .5f)).start();
-        // container.acceptNewAgent("customer5", new CustomerAgent(20, storePreferences1, .8f)).start();;
     }
     
     private static void createManager() throws StaleProxyException {

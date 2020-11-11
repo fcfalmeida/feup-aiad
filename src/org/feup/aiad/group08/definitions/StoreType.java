@@ -6,18 +6,14 @@ public enum StoreType {
     FOOD("Food-store"),
     CLOTHES("Clothes-store"),
     FURNITURE("Furniture-store"),
-    BOOKS("Books-store"),
-    GAMES("Game-store");
+    BOOK("Books-store"),
+    GAME("Game-store");
 
     private final String type;
 
     StoreType(final String type) {
         this.type = type;
     }
-
-    // public static StoreType fromString(String value){
-    //     return new StoreType(value);
-    // }
 
     @Override 
     public String toString() {

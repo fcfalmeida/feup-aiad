@@ -47,8 +47,8 @@ public class Utils {
         K highestKey = null;
         V highestValue = null;
 
-        for( Map.Entry<K, V> entry : map.entrySet()){
-            if(entry.getValue().compareTo(highestValue) > 0){
+        for( Map.Entry<K, V> entry : map.entrySet()){            
+            if(highestValue == null || entry.getValue().compareTo(highestValue) > 0){
                 highestValue = entry.getValue();
                 highestKey = entry.getKey();
             }

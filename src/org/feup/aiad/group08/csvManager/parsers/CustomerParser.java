@@ -10,11 +10,12 @@ public class CustomerParser implements Parser<CustomerAgent> {
 
         String customerName = line.get(0);
         float initBalance = Float.valueOf(line.get(1));
-        List<StoreType> storePreferences = new ArrayList<StoreType>();
-        storePreferences.add(StoreType.valueOf(line.get(2)));
+        float influenceability = Float.valueOf(line.get(2));
+        List<StoreType> storePreferences = new ArrayList<StoreType>();        
         storePreferences.add(StoreType.valueOf(line.get(3)));
         storePreferences.add(StoreType.valueOf(line.get(4)));
-        float influenceability = Float.valueOf(line.get(5));
+        storePreferences.add(StoreType.valueOf(line.get(5)));
+        
 
         return new CustomerAgent(customerName, initBalance, storePreferences, influenceability);
     
