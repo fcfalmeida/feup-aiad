@@ -1,5 +1,6 @@
 package org.feup.aiad.group08;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,9 @@ import org.feup.aiad.group08.agents.CustomerAgent;
 import org.feup.aiad.group08.agents.ManagerAgent;
 import org.feup.aiad.group08.agents.StoreAgent;
 import org.feup.aiad.group08.agents.WarehouseAgent;
+import org.feup.aiad.group08.csvManager.CSVReader;
+import org.feup.aiad.group08.csvManager.parsers.CustomerParser;
+import org.feup.aiad.group08.csvManager.parsers.StoreParser;
 import org.feup.aiad.group08.definitions.StockPurchaseConditions;
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.utils.Utils;
@@ -22,6 +26,8 @@ import jade.core.Runtime;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
+//import jdk.internal.org.jline.reader.Parser;
+
 public class Main {
 
     static Runtime rt;
@@ -29,7 +35,7 @@ public class Main {
     static ContainerController container;
 
     public static void main(String[] args) throws StaleProxyException {
-        
+
         rt = Runtime.instance();
         p = new ProfileImpl();
         container = rt.createAgentContainer(p);
@@ -64,6 +70,24 @@ public class Main {
     }
 
     private static void createStores() throws StaleProxyException {
+
+        String fileToReadName = "./data/input/stores.csv";
+        String delimiter = ";";
+        StoreParser parser = new StoreParser();
+        CSVReader csvreader = null;
+        try {
+            csvreader = new CSVReader<>(fileToReadName, delimiter, parser);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        List<List<String>> storesData = csvreader.getData();
+        for (List<String> line : storesData) {
+            StoreAgent store = parser.parseLine(line);
+            container.acceptNewAgent(store.getName(), store).start();
+        }
+
         // container.acceptNewAgent("store1", new StoreAgent(StoreType.BOOKS, 100, 500, .15f, .4f)).start();
         // container.acceptNewAgent("store2", new StoreAgent(StoreType.TECH, 100, 782, .2f, .4f)).start();
         // container.acceptNewAgent("store3", new StoreAgent(StoreType.CLOTHES, 60, 333, .2f, .4f)).start();
@@ -75,22 +99,40 @@ public class Main {
         // container.acceptNewAgent("store9", new StoreAgent(StoreType.CLOTHES, 38, 234, .18f, .45f)).start();
     }
 
-    private static void createCustomers() throws StaleProxyException {     
-        List<StoreType> storePreferences1 = new ArrayList<>();
-        storePreferences1.add(StoreType.BOOKS);
-        storePreferences1.add(StoreType.GAMES);
-        storePreferences1.add(StoreType.FOOD);
+    private static void createCustomers() throws StaleProxyException {  
+        
+        String fileToReadName = "./data/input/customers.csv";
+        String delimiter = ";";
+        CustomerParser parser = new CustomerParser();
+        CSVReader csvreader = null;
+        try {
+            csvreader = new CSVReader<>(fileToReadName, delimiter, parser);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-        List<StoreType> storePreferences2 = new ArrayList<>();
-        storePreferences2.add(StoreType.FURNITURE);
-        storePreferences2.add(StoreType.CLOTHES);
-        storePreferences2.add(StoreType.TECH);
+        List<List<String>> customersData = csvreader.getData();
+        for (List<String> line : customersData) {
+            CustomerAgent customer = parser.parseLine(line);
+            container.acceptNewAgent(customer.getName(), customer).start();
+        }
+    
+        // List<StoreType> storePreferences1 = new ArrayList<>();
+        // storePreferences1.add(StoreType.BOOKS);
+        // storePreferences1.add(StoreType.GAMES);
+        // storePreferences1.add(StoreType.FOOD);
 
-        container.acceptNewAgent("customer1", new CustomerAgent(100, storePreferences1, 1f)).start();
-        container.acceptNewAgent("customer2", new CustomerAgent(200, storePreferences1, 1f)).start();
-        container.acceptNewAgent("customer3", new CustomerAgent(10, storePreferences2, 1f)).start();
-        container.acceptNewAgent("customer4", new CustomerAgent(50, storePreferences2, .5f)).start();
-        container.acceptNewAgent("customer5", new CustomerAgent(20, storePreferences1, .8f)).start();;
+        // List<StoreType> storePreferences2 = new ArrayList<>();
+        // storePreferences2.add(StoreType.FURNITURE);
+        // storePreferences2.add(StoreType.CLOTHES);
+        // storePreferences2.add(StoreType.TECH);
+
+        // container.acceptNewAgent("customer1", new CustomerAgent(100, storePreferences1, 1f)).start();
+        // container.acceptNewAgent("customer2", new CustomerAgent(200, storePreferences1, 1f)).start();
+        // container.acceptNewAgent("customer3", new CustomerAgent(10, storePreferences2, 1f)).start();
+        // container.acceptNewAgent("customer4", new CustomerAgent(50, storePreferences2, .5f)).start();
+        // container.acceptNewAgent("customer5", new CustomerAgent(20, storePreferences1, .8f)).start();;
     }
     
     private static void createManager() throws StaleProxyException {

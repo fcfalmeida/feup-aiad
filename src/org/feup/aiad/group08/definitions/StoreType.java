@@ -15,7 +15,11 @@ public enum StoreType {
         this.type = type;
     }
 
-    @Override
+    // public static StoreType fromString(String value){
+    //     return new StoreType(value);
+    // }
+
+    @Override 
     public String toString() {
         return type;
     }
