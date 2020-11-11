@@ -215,7 +215,7 @@ public class StoreAgent extends DFUserAgent {
                 currentStock += receipt.getQuantity();
                 balanceAvailable -= receipt.getTotalPrice();
 
-                System.out.println("Store " + getAID().getName()
+                System.out.println("Store " + storeName
                         + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt
                         + "\nCurrent stock: " + currentStock + "/" + stockCapacity + "\nAvailable Balance: "
                         + balanceAvailable);
@@ -310,7 +310,7 @@ public class StoreAgent extends DFUserAgent {
             currentStock--;
             balanceAvailable += receipt.getItemPrice();
 
-            System.out.println("Store received item purchase request from " + request.getSender().getName());
+            System.out.println("Store received item purchase request from " + request.getSender().getLocalName());
 
             return res;
         }

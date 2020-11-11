@@ -37,7 +37,8 @@ public class CustomerAgent extends DFUserAgent {
 
     private List<SalesInfo> salesInfo = new Vector<>();
 
-    public CustomerAgent(String customerName,float initBalance, List<StoreType> storePreferences, float influenceability) {
+    public CustomerAgent(String customerName, float initBalance, List<StoreType> storePreferences,
+            float influenceability) {
         addSystemRole(SystemRole.CUSTOMER);
 
         this.customerName = customerName;
@@ -52,7 +53,7 @@ public class CustomerAgent extends DFUserAgent {
         addBehaviour(new ReceiveAdvertisementBehaviour(this));
     }
 
-    public String getCustomerName(){
+    public String getCustomerName() {
         return customerName;
     }
 
@@ -95,9 +96,9 @@ public class CustomerAgent extends DFUserAgent {
                 }
 
                 ACLMessage purchaseItemMsg = MessageFactory.purchaseItem(bestItem);
-                
+
                 addBehaviour(new PurchaseItemBehaviour(getAgent(), purchaseItemMsg));
-                
+
             } catch (UnreadableException e) {
                 e.printStackTrace();
             }
@@ -105,29 +106,32 @@ public class CustomerAgent extends DFUserAgent {
     }
 
     /**
-     * This class is used for the CustomerAgent to communicate that it wants to buy an item from a StoreAgent.
+     * This class is used for the CustomerAgent to communicate that it wants to buy
+     * an item from a StoreAgent.
      */
-    private class PurchaseItemBehaviour extends AchieveREInitiator{
-        
+    private class PurchaseItemBehaviour extends AchieveREInitiator {
+
         private static final long serialVersionUID = 1L;
 
         public PurchaseItemBehaviour(Agent a, ACLMessage msg) {
-			super(a, msg);
+            super(a, msg);
         }
-        
+
         @Override
         protected void handleRefuse(ACLMessage refuse) {
             System.out.println("Customer " + customerName + " couldn't purchase the item because it is out of stock");
         }
-		
+
         @Override
         protected void handleInform(ACLMessage inform) {
-            System.out.println("Store " + getAID().getName() + " received item purchase confirmation from Store");
+            System.out.println("Customer " + customerName + " received item purchase confirmation from "
+                    + inform.getSender().getLocalName());
             // The item is successfully purchased from the store.
             ItemPurchaseReceipt receipt;
             try {
                 receipt = (ItemPurchaseReceipt) inform.getContentObject();
-                happiness = calculateHappiness(receipt.getStoreType(), receipt.getItemPrice(), receipt.getItemDiscount());
+                happiness = calculateHappiness(receipt.getStoreType(), receipt.getItemPrice(),
+                        receipt.getItemDiscount());
                 System.out.println("Customer " + customerName + " happiness: " + happiness);
             } catch (UnreadableException e) {
                 e.printStackTrace();
@@ -135,21 +139,24 @@ public class CustomerAgent extends DFUserAgent {
         }
     }
 
-    private SalesInfo decideBestPurchase(){
+    private SalesInfo decideBestPurchase() {
         // Map that stores SalesInfo and their respective probabilities
         Map<SalesInfo, Float> preferenceProbs = new HashMap<>();
 
-        // For each SalesInfo calculate its preference probability base on the ranking of the customer
+        // For each SalesInfo calculate its preference probability base on the ranking
+        // of the customer
         for (SalesInfo sInfo : salesInfo) {
             float preferenceProb = calculatePreferenceProb(sInfo.storeType());
-            // Here the preference probability is multiplied by the discount and influenceavbility to get the probability of the items getting bought
-            // These aren't actually probabilities and should be called weights because the values can be bigger than 1.
-            if(preferenceProb > 0) {
+            // Here the preference probability is multiplied by the discount and
+            // influenceavbility to get the probability of the items getting bought
+            // These aren't actually probabilities and should be called weights because the
+            // values can be bigger than 1.
+            if (preferenceProb > 0) {
                 preferenceProbs.put(sInfo, preferenceProb * sInfo.discountPercentage() * influenceability);
             }
         }
-        
-        //Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
+
+        // Distribution<SalesInfo> salesDist = new Distribution<>(preferenceProbs);
         SalesInfo bestItem = Utils.highestEntry(preferenceProbs);
 
         // If the customer has no money they can't buy the item
@@ -158,24 +165,25 @@ public class CustomerAgent extends DFUserAgent {
         }
 
         System.out.println(bestItem);
-        return bestItem;      
+        return bestItem;
     }
 
-    // This method finds the StoreType preference rank of the customer preferences and calculates its probability
-    private float calculatePreferenceProb(StoreType preference){
+    // This method finds the StoreType preference rank of the customer preferences
+    // and calculates its probability
+    private float calculatePreferenceProb(StoreType preference) {
         int index = storePreferences.indexOf(preference);
 
-        if(index == -1){
+        if (index == -1) {
             return 0f;
         }
-        
+
         // The last element of storePreferences list has the highest percentage
-        return (float)(index + 1)/storePreferences.size();
+        return (float) (index + 1) / storePreferences.size();
     }
 
-    private float calculateHappiness(StoreType storeType, float itemPrice, float itemDiscount){
-        float prefHappiness =  calculatePreferenceProb(storeType);
-        float happy = (prefHappiness * itemDiscount + happiness)/2;
+    private float calculateHappiness(StoreType storeType, float itemPrice, float itemDiscount) {
+        float prefHappiness = calculatePreferenceProb(storeType);
+        float happy = (prefHappiness * itemDiscount + happiness) / 2;
         return Utils.roundTo2Decimals(happy);
     }
 }
