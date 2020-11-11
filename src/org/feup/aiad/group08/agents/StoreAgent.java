@@ -331,7 +331,7 @@ public class StoreAgent extends DFUserAgent {
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
 
-            ItemPurchaseReceipt receipt = new ItemPurchaseReceipt(currentSale.getItemPrice());
+            ItemPurchaseReceipt receipt = new ItemPurchaseReceipt(type, currentSale.getItemPrice(), currentSale.discountPercentage());
             ACLMessage res = MessageFactory.purchaseItemReply(request, receipt);
 
             currentStock--;

@@ -18,6 +18,7 @@ import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.utils.Distribution;
 import org.feup.aiad.group08.utils.Utils;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 
@@ -32,6 +33,7 @@ public class CustomerAgent extends DFUserAgent {
     private float balance; // The total funds availaible for the customer to purchase.
     private float influenceability; // Each agent can be more easily or not influenced by promotions
     private List<StoreType> storePreferences;
+    private float happiness = 1;
 
     private List<SalesInfo> salesInfo = new Vector<>();
 
@@ -121,12 +123,18 @@ public class CustomerAgent extends DFUserAgent {
         protected void handleInform(ACLMessage inform) {
             System.out.println("Store " + getAID().getName() + " received item purchase confirmation from Store");
             // The item is successfully purchased from the store.
+            ItemPurchaseReceipt receipt;
+            try {
+                receipt = (ItemPurchaseReceipt) inform.getContentObject();
+                happiness = calculateHappiness(receipt.getStoreType(), receipt.getItemPrice(), receipt.getItemDiscount());
+                System.out.println("Customer " + customerName + " happiness: " + happiness);
+            } catch (UnreadableException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private SalesInfo decideBestPurchase(){
-        // We need to add the SalesInfoVector from the Advertiser Agent
-        
         // Map that stores SalesInfo and their respective probabilities
         Map<SalesInfo, Float> preferenceProbs = new HashMap<>();
 
@@ -162,5 +170,11 @@ public class CustomerAgent extends DFUserAgent {
         
         // The last element of storePreferences list has the highest percentage
         return (float)(index + 1)/storePreferences.size();
+    }
+
+    private float calculateHappiness(StoreType storeType, float itemPrice, float itemDiscount){
+        float prefHappiness =  calculatePreferenceProb(storeType);
+        float happy = (prefHappiness * itemDiscount + happiness)/2;
+        return Utils.roundTo2Decimals(happy);
     }
 }
