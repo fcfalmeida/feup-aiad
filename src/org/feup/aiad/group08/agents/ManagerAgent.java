@@ -1,5 +1,6 @@
 package org.feup.aiad.group08.agents;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +10,9 @@ import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.csvManager.CSVWriter;
+import org.feup.aiad.group08.csvManager.writers.AgentDataWriter;
+import org.feup.aiad.group08.csvManager.writers.IterationWriter;
 import org.feup.aiad.group08.data.AgentStatus;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemPhase;
@@ -143,10 +147,12 @@ public class ManagerAgent extends DFUserAgent {
 
                 if (statuses.size() == expectedStatuses) {
                     System.out.println(Arrays.toString(statuses.toArray()));
-                    // TODO: write to file
+                    
+                    writeAgentStatuses();
+                    
                     nextPhase();
                 }
-                
+
             } catch (UnreadableException e) {
                 e.printStackTrace();
             }
@@ -196,5 +202,20 @@ public class ManagerAgent extends DFUserAgent {
             receivers.add(advertiser);
         }
 
+    }
+
+    private void writeAgentStatuses() {
+        List<Integer> iteration = new ArrayList<>();
+        iteration.add(currentIteration);
+
+        CSVWriter<Integer> iterationWriter = new CSVWriter<>("out.csv", ",", iteration, new IterationWriter());
+        CSVWriter<AgentStatus> writer = new CSVWriter<>("out.csv", ",", statuses, new AgentDataWriter());
+
+        try {
+            iterationWriter.writeData();
+            writer.writeData();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package org.feup.aiad.group08.csvManager;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.feup.aiad.group08.csvManager.writers.Writer;
@@ -12,7 +13,7 @@ public class CSVWriter<T> {
 
     private String fileToWriteName;
     private String delimiter;
-    private List<T> data;
+    private Collection<T> data;
     private Writer<T> writer;
     
     /**
@@ -23,7 +24,7 @@ public class CSVWriter<T> {
      * @param writer - The writer object responsible for generating a line for the object of type T
      * @throws IOException
      */
-    public CSVWriter(String fileToWriteName, String delimiter, List<T> data, Writer<T> writer) {
+    public CSVWriter(String fileToWriteName, String delimiter, Collection<T> data, Writer<T> writer) {
 
         this.fileToWriteName = fileToWriteName;
         this.delimiter = delimiter;
@@ -39,16 +40,18 @@ public class CSVWriter<T> {
         return delimiter;
     }
 
-    public List<T> getData(){
+    public Collection<T> getData(){
         return data;
     }
 
     public void writeData() throws IOException {
-        try( BufferedWriter buffWriter = new BufferedWriter(new FileWriter(fileToWriteName))){
+        try( BufferedWriter buffWriter = new BufferedWriter(new FileWriter(fileToWriteName, true))){
             for(T obj : data ) {
                 List<String> line = writer.writeLine(obj);
-                for (String lineValue : line){
-                    buffWriter.write( lineValue + delimiter);                    
+                for (int i = 0; i < line.size(); i++) {
+                    String lineValue = line.get(i);
+                    String delimiterToWrite = i < line.size() - 1 ? delimiter : "";
+                    buffWriter.write( lineValue + delimiterToWrite); 
                 }
                 buffWriter.newLine();
             }
