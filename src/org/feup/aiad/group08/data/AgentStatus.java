@@ -28,10 +28,8 @@ public class AgentStatus implements Serializable {
             sb.append(param.getKey())
                 .append(": ")
                 .append(param.getValue())
-                .append(count == params.size() ? "," : "");
+                .append(count < params.size() ? ", " : "");
         }
-
-        sb.append("\n");
 
         return sb.toString();
     }

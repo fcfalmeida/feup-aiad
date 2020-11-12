@@ -147,7 +147,7 @@ public class ManagerAgent extends DFUserAgent {
                 int expectedStatuses = stores.size() + customers.size();
 
                 if (statuses.size() == expectedStatuses) {
-                    System.out.println(Arrays.toString(statuses.toArray()));
+                    // TODO: write to file
                 }
                 
             } catch (UnreadableException e) {
