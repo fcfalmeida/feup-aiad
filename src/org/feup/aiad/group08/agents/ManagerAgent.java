@@ -69,7 +69,7 @@ public class ManagerAgent extends DFUserAgent {
                 break;
             case SALES:
                 if (currentIteration <= maxIterations) {
-                    System.out.println("Iteration " + currentIteration + "/" + maxIterations);
+                    System.out.println("\nIteration " + currentIteration + "/" + maxIterations);
                     startRestockPhase();
                     currentIteration++;
                 } else
@@ -82,7 +82,7 @@ public class ManagerAgent extends DFUserAgent {
 
     private void startRestockPhase() {
         currentPhase = SystemPhase.RESTOCK;
-        System.out.println("RESTOCK PHASE");
+        System.out.println("\nRESTOCK PHASE");
 
         stockPurchaseConfirmations.clear();
         stores = search(SystemRole.STORE);
@@ -93,7 +93,7 @@ public class ManagerAgent extends DFUserAgent {
     private void startSalesPhase() {
         currentPhase = SystemPhase.SALES;
         salesPhaseElapsedTime = 0;
-        System.out.println("SALES PHASE");
+        System.out.println("\nSALES PHASE");
 
         customers = search(SystemRole.CUSTOMER);
 
@@ -110,8 +110,10 @@ public class ManagerAgent extends DFUserAgent {
 
         @Override
         protected void onTick() {
-            if (currentIteration > maxIterations)
+            if (currentIteration > maxIterations){
+                
                 stop();
+            }
 
             if (currentPhase.equals(SystemPhase.SALES)) {
                 salesPhaseElapsedTime++;
@@ -121,6 +123,21 @@ public class ManagerAgent extends DFUserAgent {
                 }
             }
         }
+    }
+
+    private class RequestAgentStatusBehaviour extends AchieveREInitiator {
+
+        private static final long serialVersionUID = 1L;
+
+        public RequestAgentStatusBehaviour(Agent a, ACLMessage msg) {
+            super(a, msg);
+        }
+
+        @Override
+        protected void handleInform(ACLMessage inform) {
+            super.handleInform(inform);
+        }
+
     }
 
     private class AuthorizeStockPurchaseBehaviour extends InformBehaviour {

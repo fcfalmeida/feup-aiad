@@ -19,7 +19,10 @@ public enum MessageType {
     // Sent by StoreAgent to AdvertiserAgent to let them know what sale the store will be doing
     STORE_SALES_INFO("store-sales-info"),
     // Sent by AdvertiserAgent to all CustomerAgent to inform them of current sales
-    ADVERTISER_SALES_INFO("advertiser-sales-info");
+    ADVERTISER_SALES_INFO("advertiser-sales-info"),
+
+    // Sent by ManagerAgent to all Agents
+    AGENT_STATUS("agent-status");
 
     private final String type;
 

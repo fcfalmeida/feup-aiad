@@ -45,6 +45,8 @@ public class StoreAgent extends DFUserAgent {
     // stock sold in each iteration
     private List<Integer> salesHistory = new ArrayList<>();
     private SalesInfo currentSale;
+    private int totalItemsSold;
+    private float totalProfit;
 
     public StoreAgent(String storeName,StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
@@ -322,5 +324,13 @@ public class StoreAgent extends DFUserAgent {
 
     public String getStoreName(){
         return storeName;
+    }
+
+    public int getTotalItemsSold() {
+        return totalItemsSold;
+    }
+
+    public float getTotalProfit() {
+        return totalProfit;
     }
 }
