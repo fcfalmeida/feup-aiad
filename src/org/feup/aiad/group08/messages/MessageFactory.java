@@ -3,6 +3,7 @@ package org.feup.aiad.group08.messages;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.feup.aiad.group08.data.AgentStatus;
 import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
@@ -103,5 +104,13 @@ public class MessageFactory {
 
     public static ACLMessage purchaseItemReply(ACLMessage from, ItemPurchaseReceipt ipr) {
         return createReply(from, ACLMessage.INFORM, ipr);
+    }
+
+    public static ACLMessage agentStatus(AID... receivers) {
+        return createMessage(MessageType.AGENT_STATUS, ACLMessage.REQUEST, receivers);
+    }
+
+    public static ACLMessage agentStatusReply(ACLMessage from, AgentStatus status) {
+        return createReply(from, ACLMessage.INFORM, status);
     }
 }

@@ -3,11 +3,9 @@ package org.feup.aiad.group08.agents;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.Profile;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
@@ -19,6 +17,8 @@ import jade.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.data.AgentStatus;
+import org.feup.aiad.group08.data.StoreData;
 import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
@@ -29,7 +29,7 @@ import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.utils.Utils;
 
-public class StoreAgent extends DFUserAgent {
+public class StoreAgent extends DFUserAgent implements StatusReporter {
 
     private static final long serialVersionUID = -3205276776739404040L;
     private final String storeName;
@@ -48,9 +48,9 @@ public class StoreAgent extends DFUserAgent {
     private int totalItemsSold;
     private float totalProfit;
 
-    public StoreAgent(String storeName,StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
+    public StoreAgent(String storeName, StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
-        this.storeName = storeName;      
+        this.storeName = storeName;
         this.type = type;
         this.stockCapacity = stockCapacity;
         balanceAvailable = initBalance;
@@ -66,6 +66,31 @@ public class StoreAgent extends DFUserAgent {
         addBehaviour(new ReceiveStockPurchaseAuthorizationBehaviour(this));
         addBehaviour(new SendSaleInfo(this));
         addBehaviour(new ReceiveItemPurchaseRequestBehaviour(this));
+        addBehaviour(new SendStatusReportBehaviour(this));
+    }
+
+    private class SendStatusReportBehaviour extends AchieveREResponder {
+
+        private static final long serialVersionUID = -8041366365965498753L;
+
+        public SendStatusReportBehaviour(Agent a) {
+            super(a, MessageTemplate.MatchConversationId(MessageType.AGENT_STATUS.toString()));
+        }
+
+        @Override
+        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
+            return null;
+        }
+
+        @Override
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+            
+            AgentStatus status = createStatusReport();
+            ACLMessage statusMessage = MessageFactory.agentStatusReply(request, status);
+
+            return statusMessage;
+        }
     }
 
     private class ReceiveStockPurchaseAuthorizationBehaviour extends ReceiveInformBehaviour {
@@ -217,10 +242,10 @@ public class StoreAgent extends DFUserAgent {
                 currentStock += receipt.getQuantity();
                 balanceAvailable -= receipt.getTotalPrice();
 
-                System.out.println("Store " + storeName
-                        + " received stock purchase confirmation from Warehouse\nReceipt: " + receipt
-                        + "\nCurrent stock: " + currentStock + "/" + stockCapacity + "\nAvailable Balance: "
-                        + balanceAvailable);
+                System.out.println(
+                        "Store " + storeName + " received stock purchase confirmation from Warehouse\nReceipt: "
+                                + receipt + "\nCurrent stock: " + currentStock + "/" + stockCapacity
+                                + "\nAvailable Balance: " + balanceAvailable);
 
                 currentSale = decideCurrentSale(receipt.getUnitPrice());
 
@@ -273,9 +298,9 @@ public class StoreAgent extends DFUserAgent {
             float sellingPrice = purchasePrice + purchasePrice * desiredProfitMargin;
             float bestDiscount = SalesInfo.bestDiscount(purchasePrice, sellingPrice, minProfitMargin);
             float sellingPriceWithDiscount = Utils.applyDiscount(sellingPrice, bestDiscount);
-    
+
             SalesInfo si = new SalesInfo(sellingPriceWithDiscount, bestDiscount, type, getAID());
-    
+
             return si;
         } else {
             return new SalesInfo(0, 0, type, getAID());
@@ -306,7 +331,8 @@ public class StoreAgent extends DFUserAgent {
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
 
-            ItemPurchaseReceipt receipt = new ItemPurchaseReceipt(type, currentSale.getItemPrice(), currentSale.discountPercentage());
+            ItemPurchaseReceipt receipt = new ItemPurchaseReceipt(type, currentSale.getItemPrice(),
+                    currentSale.discountPercentage());
             ACLMessage res = MessageFactory.purchaseItemReply(request, receipt);
 
             currentStock--;
@@ -322,7 +348,7 @@ public class StoreAgent extends DFUserAgent {
         return type;
     }
 
-    public String getStoreName(){
+    public String getStoreName() {
         return storeName;
     }
 
@@ -332,5 +358,12 @@ public class StoreAgent extends DFUserAgent {
 
     public float getTotalProfit() {
         return totalProfit;
+    }
+
+    @Override
+    public AgentStatus createStatusReport() {
+        StoreData data = new StoreData(totalItemsSold, totalProfit);
+
+        return data.toAgentStatus();
     }
 }

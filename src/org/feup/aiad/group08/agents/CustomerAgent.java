@@ -1,33 +1,34 @@
 package org.feup.aiad.group08.agents;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Vector;
 
 import jade.core.Agent;
+import jade.domain.FIPAAgentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
+import jade.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
-import org.feup.aiad.group08.utils.Distribution;
 import org.feup.aiad.group08.utils.Utils;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.data.AgentStatus;
+import org.feup.aiad.group08.data.CustomerData;
 import org.feup.aiad.group08.definitions.ItemPurchaseReceipt;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 
-public class CustomerAgent extends DFUserAgent {
+public class CustomerAgent extends DFUserAgent implements StatusReporter {
 
     private static final long serialVersionUID = -8345978142167560058L;
-
-    private static final float INFLUENCE_UPPER_LIMIT = 1f;
-    private static final float INFLUENCE_LOWER_LIMIT = 0.2f;
 
     private String customerName;
     private float balance; // The total funds availaible for the customer to purchase.
@@ -51,6 +52,7 @@ public class CustomerAgent extends DFUserAgent {
     protected void setup() {
         super.setup();
         addBehaviour(new ReceiveAdvertisementBehaviour(this));
+        addBehaviour(new SendStatusReportBehaviour(this));
     }
 
     public String getCustomerName() {
@@ -69,10 +71,28 @@ public class CustomerAgent extends DFUserAgent {
         return influenceability;
     }
 
-    // This method generates a random integer between an interval that will define
-    // how influentable the costumer is to sales.
-    private static float generateInfluenceability() {
-        return INFLUENCE_LOWER_LIMIT + new Random().nextFloat() * (INFLUENCE_UPPER_LIMIT - INFLUENCE_LOWER_LIMIT);
+    private class SendStatusReportBehaviour extends AchieveREResponder {
+
+        private static final long serialVersionUID = 6646755738292798507L;
+
+        public SendStatusReportBehaviour(Agent a) {
+            super(a, MessageTemplate.MatchConversationId(MessageType.AGENT_STATUS.toString()));
+        }
+
+        @Override
+        protected ACLMessage prepareResponse(ACLMessage request) throws NotUnderstoodException, RefuseException {
+            return null;
+        }
+
+        @Override
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+            
+            AgentStatus status = createStatusReport();
+            ACLMessage statusMessage = MessageFactory.agentStatusReply(request, status);
+
+            return statusMessage;
+        }
     }
 
     private class ReceiveAdvertisementBehaviour extends ReceiveInformBehaviour {
@@ -185,5 +205,12 @@ public class CustomerAgent extends DFUserAgent {
         float prefHappiness = calculatePreferenceProb(storeType);
         float happy = (prefHappiness * itemDiscount + happiness) / 2;
         return Utils.roundTo2Decimals(happy);
+    }
+
+    @Override
+    public AgentStatus createStatusReport() {
+        CustomerData data = new CustomerData(happiness);
+
+        return data.toAgentStatus();
     }
 }

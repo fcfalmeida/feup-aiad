@@ -1,6 +1,7 @@
 package org.feup.aiad.group08.agents;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -8,19 +9,16 @@ import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
+import org.feup.aiad.group08.data.AgentStatus;
 import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemPhase;
 
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
-import jade.domain.FIPAAgentManagement.FailureException;
-import jade.domain.FIPAAgentManagement.NotUnderstoodException;
-import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
-import jade.proto.AchieveREResponder;
 
 public class ManagerAgent extends DFUserAgent {
 
@@ -37,6 +35,8 @@ public class ManagerAgent extends DFUserAgent {
     private Vector<AID> stockPurchaseConfirmations = new Vector<>();
     // Total customers that exist during the current iteration
     private List<AID> customers = new ArrayList<>();
+    // Agent statuses
+    private Vector<AgentStatus> statuses = new Vector<>();
 
     public int salesPhaseDuration;
 
@@ -110,8 +110,13 @@ public class ManagerAgent extends DFUserAgent {
 
         @Override
         protected void onTick() {
-            if (currentIteration > maxIterations){
-                
+            if (currentIteration > maxIterations) {
+                List<AID> receivers = new ArrayList<>(stores);
+                receivers.addAll(customers);
+
+                ACLMessage statusMsg = MessageFactory.agentStatus(receivers.toArray(new AID[0]));
+                addBehaviour(new RequestAgentStatusBehaviour(getAgent(), statusMsg));
+
                 stop();
             }
 
@@ -135,7 +140,19 @@ public class ManagerAgent extends DFUserAgent {
 
         @Override
         protected void handleInform(ACLMessage inform) {
-            super.handleInform(inform);
+            try {
+                AgentStatus status = (AgentStatus) inform.getContentObject();
+                statuses.add(status);
+
+                int expectedStatuses = stores.size() + customers.size();
+
+                if (statuses.size() == expectedStatuses) {
+                    System.out.println(Arrays.toString(statuses.toArray()));
+                }
+                
+            } catch (UnreadableException e) {
+                e.printStackTrace();
+            }
         }
 
     }
