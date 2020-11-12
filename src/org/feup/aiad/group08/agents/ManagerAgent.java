@@ -28,7 +28,7 @@ public class ManagerAgent extends DFUserAgent {
     private SystemPhase currentPhase = SystemPhase.SALES;
     private int salesPhaseElapsedTime;
     private int maxIterations;
-    private int currentIteration;
+    private int currentIteration = 0;
     // Total stores that exist during the current iteration
     private List<AID> stores = new ArrayList<>();
     // Stores that have finished purchasing for the current iteration
@@ -43,7 +43,6 @@ public class ManagerAgent extends DFUserAgent {
     public ManagerAgent(int salesPhaseDuration, int maxIterations) {
         this.salesPhaseDuration = salesPhaseDuration;
         this.maxIterations = maxIterations;
-        currentIteration = 1;
 
         addSystemRole(SystemRole.MANAGER);
     }
@@ -68,8 +67,8 @@ public class ManagerAgent extends DFUserAgent {
                 startSalesPhase();
                 break;
             case SALES:
-                if (currentIteration <= maxIterations) {
-                    System.out.println("\nIteration " + currentIteration + "/" + maxIterations);
+                if (currentIteration < maxIterations) {
+                    System.out.println("\nIteration " + (currentIteration + 1) + "/" + maxIterations);
                     startRestockPhase();
                     currentIteration++;
                 } else
@@ -110,21 +109,17 @@ public class ManagerAgent extends DFUserAgent {
 
         @Override
         protected void onTick() {
-            if (currentIteration > maxIterations) {
-                List<AID> receivers = new ArrayList<>(stores);
-                receivers.addAll(customers);
-
-                ACLMessage statusMsg = MessageFactory.agentStatus(receivers.toArray(new AID[0]));
-                addBehaviour(new RequestAgentStatusBehaviour(getAgent(), statusMsg));
-
-                stop();
-            }
-
             if (currentPhase.equals(SystemPhase.SALES)) {
                 salesPhaseElapsedTime++;
 
                 if (salesPhaseElapsedTime == salesPhaseDuration) {
-                    nextPhase();
+                    // Clear status messages received on the previous iteration
+                    statuses.clear();
+                    List<AID> receivers = new ArrayList<>(stores);
+                    receivers.addAll(customers);
+
+                    ACLMessage statusMsg = MessageFactory.agentStatus(receivers.toArray(new AID[0]));
+                    addBehaviour(new RequestAgentStatusBehaviour(getAgent(), statusMsg));
                 }
             }
         }
@@ -132,7 +127,7 @@ public class ManagerAgent extends DFUserAgent {
 
     private class RequestAgentStatusBehaviour extends AchieveREInitiator {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -7991959884729782092L;
 
         public RequestAgentStatusBehaviour(Agent a, ACLMessage msg) {
             super(a, msg);
@@ -147,7 +142,9 @@ public class ManagerAgent extends DFUserAgent {
                 int expectedStatuses = stores.size() + customers.size();
 
                 if (statuses.size() == expectedStatuses) {
+                    System.out.println(Arrays.toString(statuses.toArray()));
                     // TODO: write to file
+                    nextPhase();
                 }
                 
             } catch (UnreadableException e) {
