@@ -103,6 +103,10 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
 
         @Override
         public void processMessage(ACLMessage msg) {
+            // Add to sales history and reset items sold at the start of each iteration
+            salesHistory.add(totalItemsSold);
+            totalItemsSold = 0;
+
             System.out.println(
                     "Store " + getAID().getLocalName() + " received stock purchase authorization from Manager");
 
@@ -161,7 +165,7 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
             int minQuantity = quantDiscount.getKey();
 
             // Calculate purchasable quantity based on previous discount
-            float unitPriceWithPrevDiscount = spc.getBaseUnitPrice() - (spc.getBaseUnitPrice() * prevDiscount);
+            float unitPriceWithPrevDiscount = Utils.applyDiscount(spc.getBaseUnitPrice(), prevDiscount);
             int purchasableQuantity = (int) (balanceAvailable / unitPriceWithPrevDiscount);
 
             // If balance isn't enough, the new max equals the purchasable quantity
@@ -195,7 +199,7 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
 
         if (salesAverage > 0) {
             // Quantity left to reach target (sales average)
-            int quantity = salesAverage - currentStockCapacity;
+            int quantity = Math.max(salesAverage - currentStockCapacity, 0);
             quantity = (quantity + maxQuantity) / 2;
 
             int purchasableQuantity = (int) (balanceAvailable / spc.finalUnitPrice(quantity));
@@ -337,6 +341,7 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
 
             currentStock--;
             balanceAvailable += receipt.getItemPrice();
+            totalItemsSold++;
 
             System.out.println("Store received item purchase request from " + request.getSender().getLocalName());
 
