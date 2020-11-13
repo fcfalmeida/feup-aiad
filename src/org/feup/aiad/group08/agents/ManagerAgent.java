@@ -208,8 +208,8 @@ public class ManagerAgent extends DFUserAgent {
         List<Integer> iteration = new ArrayList<>();
         iteration.add(currentIteration);
 
-        CSVWriter<Integer> iterationWriter = new CSVWriter<>("out.csv", ",", iteration, new IterationWriter());
-        CSVWriter<AgentStatus> writer = new CSVWriter<>("out.csv", ",", statuses, new AgentDataWriter());
+        CSVWriter<Integer> iterationWriter = new CSVWriter<>("data/output/out.csv", ";", iteration, new IterationWriter());
+        CSVWriter<AgentStatus> writer = new CSVWriter<>("data/output/out.csv", ";", statuses, new AgentDataWriter());
 
         try {
             iterationWriter.writeData();

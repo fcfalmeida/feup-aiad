@@ -46,7 +46,6 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
     private List<Integer> salesHistory = new ArrayList<>();
     private SalesInfo currentSale;
     private int totalItemsSold;
-    private float totalProfit;
 
     public StoreAgent(String storeName, StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
@@ -361,13 +360,9 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
         return totalItemsSold;
     }
 
-    public float getTotalProfit() {
-        return totalProfit;
-    }
-
     @Override
     public AgentStatus createStatusReport() {
-        StoreData data = new StoreData(totalItemsSold, totalProfit);
+        StoreData data = new StoreData(storeName, stockCapacity, totalItemsSold);
 
         return data.toAgentStatus();
     }

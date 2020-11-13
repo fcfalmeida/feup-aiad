@@ -25,7 +25,7 @@ public class AgentStatus implements Serializable {
 
         for (Map.Entry<String, Serializable> param : params.entrySet()) {
             count++;
-            sb.append(param.getValue()).append(count < params.size() ? ", " : "");
+            sb.append(param.getValue()).append(count < params.size() ? ";" : "");
         }
 
         return sb.toString();

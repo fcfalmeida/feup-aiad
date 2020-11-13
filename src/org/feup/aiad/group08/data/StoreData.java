@@ -2,20 +2,23 @@ package org.feup.aiad.group08.data;
 
 public class StoreData implements StatusConvertible {
 
+    public String storeName;
+    public int stockCapacity;
     public int unitsSold;
-    public float profit;
 
-    public StoreData(int unitsSold, float profit) {
+    public StoreData(String storeName, int stockCapacity, int unitsSold) {
+        this.storeName = storeName;
+        this.stockCapacity = stockCapacity;
         this.unitsSold = unitsSold;
-        this.profit = profit;
     }
 
     @Override
     public AgentStatus toAgentStatus() {
         AgentStatus status = new AgentStatus();
 
+        status.addParam("Store Name", storeName);
+        status.addParam("Store Name", stockCapacity);
         status.addParam("UnitsSold", unitsSold);
-        status.addParam("Profit", profit);
 
         return status;
     }
