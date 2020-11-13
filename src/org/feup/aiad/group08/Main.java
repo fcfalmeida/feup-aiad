@@ -1,10 +1,7 @@
 package org.feup.aiad.group08;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -17,7 +14,6 @@ import org.feup.aiad.group08.csvManager.CSVReader;
 import org.feup.aiad.group08.csvManager.parsers.CustomerParser;
 import org.feup.aiad.group08.csvManager.parsers.StoreParser;
 import org.feup.aiad.group08.definitions.StockPurchaseConditions;
-import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.utils.Utils;
 
 import jade.core.Profile;
@@ -26,7 +22,6 @@ import jade.core.Runtime;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
-//import jdk.internal.org.jline.reader.Parser;
 
 public class Main {
 
@@ -71,7 +66,7 @@ public class Main {
 
     private static void createStores() throws StaleProxyException {
 
-        String fileToReadName = "./data/input/stores.csv";
+        String fileToReadName = "./data/input/stores_high_minProfitMargin.csv";
         String delimiter = ";";
         StoreParser parser = new StoreParser();
         CSVReader csvreader = null;
@@ -91,7 +86,7 @@ public class Main {
 
     private static void createCustomers() throws StaleProxyException {  
         
-        String fileToReadName = "./data/input/customers.csv";
+        String fileToReadName = "./data/input/customers_high_balance.csv";
         String delimiter = ";";
         CustomerParser parser = new CustomerParser();
         CSVReader csvreader = null;
