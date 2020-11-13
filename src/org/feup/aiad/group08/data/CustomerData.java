@@ -20,7 +20,7 @@ public class CustomerData implements StatusConvertible {
 
         as.addParam("Name", name);
         as.addParam("Balance", balance);
-        as.addParam("Unfluenceability", influenceability);
+        as.addParam("Influenceability", influenceability);
         as.addParam("Happiness", happiness);
 
         return as;
