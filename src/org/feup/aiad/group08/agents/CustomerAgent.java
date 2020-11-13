@@ -209,7 +209,7 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
 
     @Override
     public AgentStatus createStatusReport() {
-        CustomerData data = new CustomerData(happiness);
+        CustomerData data = new CustomerData(customerName, balance, influenceability, happiness);
 
         return data.toAgentStatus();
     }
