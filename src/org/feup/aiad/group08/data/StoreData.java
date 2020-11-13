@@ -17,7 +17,7 @@ public class StoreData implements StatusConvertible {
         AgentStatus status = new AgentStatus();
 
         status.addParam("Store Name", storeName);
-        status.addParam("Store Name", stockCapacity);
+        status.addParam("Store Capacity", stockCapacity);
         status.addParam("UnitsSold", unitsSold);
 
         return status;
