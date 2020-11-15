@@ -66,7 +66,7 @@ public class Main {
 
     private static void createStores() throws StaleProxyException {
 
-        String fileToReadName = "./data/input/stores_high_minProfitMargin.csv";
+        String fileToReadName = "./data/input/stores_sumItems6.csv";
         String delimiter = ";";
         StoreParser parser = new StoreParser();
         CSVReader csvreader = null;
