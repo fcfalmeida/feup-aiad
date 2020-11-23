@@ -28,6 +28,8 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private Runtime rt;
     private Profile p;
     private ContainerController container;
+    private int numCustomers;
+    private int numStores;
 
     @Override
     public String[] getInitParam() {
@@ -95,6 +97,8 @@ public class MASShoppingLauncher extends Repast3Launcher {
             StoreAgent store = parser.parseLine(line);
             container.acceptNewAgent(store.getStoreName(), store).start();
         }
+
+        numStores = storesData.size();
     }
 
     private void createCustomers() throws StaleProxyException {  
@@ -114,10 +118,12 @@ public class MASShoppingLauncher extends Repast3Launcher {
             CustomerAgent customer = parser.parseLine(line);
             container.acceptNewAgent(customer.getCustomerName(), customer).start();
         }
+
+        numCustomers = customersData.size();
     }
     
     private void createManager() throws StaleProxyException {
-        container.acceptNewAgent("manager", new ManagerAgent(5, 3)).start();
+        container.acceptNewAgent("manager", new ManagerAgent(5, 3, numStores, numCustomers)).start();
     }
 
     private void createAdvertiser() throws StaleProxyException {

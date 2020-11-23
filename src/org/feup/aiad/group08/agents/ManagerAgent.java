@@ -19,6 +19,7 @@ import org.feup.aiad.group08.definitions.SystemPhase;
 
 import jade.core.AID;
 import sajas.core.Agent;
+import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
@@ -43,25 +44,28 @@ public class ManagerAgent extends DFUserAgent {
 
     public int salesPhaseDuration;
 
-    public ManagerAgent(int salesPhaseDuration, int maxIterations) {
+    private final int EXPECTED_CUSTOMERS;
+    private final int EXPECTED_STORES;
+
+    public ManagerAgent(int salesPhaseDuration, int maxIterations, int numStores, int numCustomers) {
         this.salesPhaseDuration = salesPhaseDuration;
         this.maxIterations = maxIterations;
+        this.EXPECTED_STORES = numStores;
+        this.EXPECTED_CUSTOMERS = numCustomers;
 
         addSystemRole(SystemRole.MANAGER);
     }
 
-    public ManagerAgent(int salesPhaseDuration) {
-        this(salesPhaseDuration, DEFAULT_MAX_ITERATIONS);
+    public ManagerAgent(int salesPhaseDuration, int numStores, int numCustomers) {
+        this(salesPhaseDuration, DEFAULT_MAX_ITERATIONS, numStores, numCustomers);
     }
 
     @Override
     protected void setup() {
         super.setup();
 
-        addBehaviour(new PhaseControlBehaviour(this, 1000));
+        addBehaviour(new EnsureAgentsConnectedBehaviour());
         addBehaviour(new ReceiveStockPurchaseConfirmationBehaviour(this));
-
-        nextPhase();
     }
 
     private void nextPhase() {
@@ -100,6 +104,38 @@ public class ManagerAgent extends DFUserAgent {
         customers = search(SystemRole.CUSTOMER);
 
         addBehaviour(new SendSalesPhaseNotification(this));
+    }
+
+    private class EnsureAgentsConnectedBehaviour extends Behaviour {
+
+        private static final long serialVersionUID = -5078909763087774953L;
+        private boolean allConnected = false;
+
+        @Override
+        public void action() {
+            while (!allConnected) {
+                List<AID> customers = search(SystemRole.CUSTOMER);
+                List<AID> stores = search(SystemRole.STORE);
+                AID advertiser = searchOne(SystemRole.ADVERTISER);
+                AID warehouse = searchOne(SystemRole.WAREHOUSE);
+
+                if (customers.size() == EXPECTED_CUSTOMERS && 
+                    stores.size() == EXPECTED_STORES && advertiser != null && warehouse != null) {
+                        System.out.println(customers.size());
+                        System.out.println(stores.size());
+                        allConnected = true;
+                    }
+            }
+
+            addBehaviour(new PhaseControlBehaviour(getAgent(), 1000));
+            nextPhase();
+        }
+
+        @Override
+        public boolean done() {
+            return allConnected;
+        }
+
     }
 
     private class PhaseControlBehaviour extends TickerBehaviour {
@@ -146,9 +182,9 @@ public class ManagerAgent extends DFUserAgent {
 
                 if (statuses.size() == expectedStatuses) {
                     System.out.println(Arrays.toString(statuses.toArray()));
-                    
+
                     writeAgentStatuses();
-                    
+
                     nextPhase();
                 }
 
@@ -207,7 +243,8 @@ public class ManagerAgent extends DFUserAgent {
         List<Integer> iteration = new ArrayList<>();
         iteration.add(currentIteration);
 
-        CSVWriter<Integer> iterationWriter = new CSVWriter<>("data/output/out.csv", ";", iteration, new IterationWriter());
+        CSVWriter<Integer> iterationWriter = new CSVWriter<>("data/output/out.csv", ";", iteration,
+                new IterationWriter());
         CSVWriter<AgentStatus> writer = new CSVWriter<>("data/output/out.csv", ";", statuses, new AgentDataWriter());
 
         try {
