@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import jade.core.Agent;
+import sajas.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.AchieveREInitiator;
-import jade.proto.AchieveREResponder;
+import sajas.proto.AchieveREInitiator;
+import sajas.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
@@ -27,8 +27,6 @@ import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SalesInfo;
 
 public class CustomerAgent extends DFUserAgent implements StatusReporter {
-
-    private static final long serialVersionUID = -8345978142167560058L;
 
     private String customerName;
     private float balance; // The total funds availaible for the customer to purchase.

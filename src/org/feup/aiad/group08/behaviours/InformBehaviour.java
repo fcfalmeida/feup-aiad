@@ -9,8 +9,8 @@ import java.util.List;
 import org.feup.aiad.group08.definitions.MessageType;
 
 import jade.core.AID;
-import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
+import sajas.core.Agent;
+import sajas.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class InformBehaviour extends OneShotBehaviour {

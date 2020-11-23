@@ -2,8 +2,8 @@ package org.feup.aiad.group08.behaviours;
 
 import org.feup.aiad.group08.definitions.MessageType;
 
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
+import sajas.core.Agent;
+import sajas.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 

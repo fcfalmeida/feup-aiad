@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 import jade.core.AID;
-import jade.core.Agent;
+import sajas.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.AchieveREInitiator;
-import jade.proto.AchieveREResponder;
+import sajas.proto.AchieveREInitiator;
+import sajas.proto.AchieveREResponder;
 
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
@@ -31,7 +31,6 @@ import org.feup.aiad.group08.utils.Utils;
 
 public class StoreAgent extends DFUserAgent implements StatusReporter {
 
-    private static final long serialVersionUID = -3205276776739404040L;
     private final String storeName;
     private final StoreType type;
     private float balanceAvailable;

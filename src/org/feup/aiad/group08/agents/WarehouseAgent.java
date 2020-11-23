@@ -6,18 +6,16 @@ import org.feup.aiad.group08.definitions.StockPurchaseReceipt;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 
-import jade.core.Agent;
+import sajas.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.AchieveREResponder;
+import sajas.proto.AchieveREResponder;
 
 public class WarehouseAgent extends DFUserAgent {
-
-    private static final long serialVersionUID = -908203983166089013L;
 
     private StockPurchaseConditions spc;
 

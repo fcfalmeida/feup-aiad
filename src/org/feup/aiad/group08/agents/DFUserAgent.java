@@ -6,20 +6,18 @@ import java.util.List;
 import org.feup.aiad.group08.definitions.SystemRole;
 
 import jade.core.AID;
-import jade.core.Agent;
-import jade.domain.DFService;
+import sajas.core.Agent;
+import sajas.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class DFUserAgent extends Agent {
 
-    private static final long serialVersionUID = -3233593926341881240L;
-
     private List<SystemRole> systemRoles = new ArrayList<>();
 
-    protected void addSystemRole(SystemRole SystemRole) {
-        systemRoles.add(SystemRole);
+    protected void addSystemRole(SystemRole systemRole) {
+        systemRoles.add(systemRole);
     }
     
     @Override

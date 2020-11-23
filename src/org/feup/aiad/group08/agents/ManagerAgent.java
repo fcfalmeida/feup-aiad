@@ -18,15 +18,14 @@ import org.feup.aiad.group08.definitions.MessageType;
 import org.feup.aiad.group08.definitions.SystemPhase;
 
 import jade.core.AID;
-import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
+import sajas.core.Agent;
+import sajas.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
-import jade.proto.AchieveREInitiator;
+import sajas.proto.AchieveREInitiator;
 
 public class ManagerAgent extends DFUserAgent {
 
-    private static final long serialVersionUID = 1L;
     private static final int DEFAULT_MAX_ITERATIONS = 5;
 
     private SystemPhase currentPhase = SystemPhase.SALES;

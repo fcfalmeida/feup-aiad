@@ -12,17 +12,14 @@ import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
 
 import jade.core.AID;
-import jade.core.Agent;
+import sajas.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
-import jade.proto.AchieveREInitiator;
+import sajas.proto.AchieveREInitiator;
 
 public class AdvertiserAgent extends DFUserAgent {
 
-    private static final long serialVersionUID = 8000251209494037807L;
-
     private Vector<SalesInfo> salesInfo = new Vector<>();
-    private List<AID> customers = new ArrayList<>();
     private List<AID> stores = new ArrayList<>();
 
     public AdvertiserAgent() {
@@ -48,7 +45,6 @@ public class AdvertiserAgent extends DFUserAgent {
         public void processMessage(ACLMessage msg) {
             salesInfo.clear();
 
-            customers = search(SystemRole.CUSTOMER);
             stores = search(SystemRole.STORE);
 
             ACLMessage requestSalesInfoMsg = MessageFactory.storeSalesInfo(stores.toArray(new AID[0]));
@@ -88,6 +84,7 @@ public class AdvertiserAgent extends DFUserAgent {
 
         public AdvertiseBehaviour(Agent agent) {
             super(agent, MessageType.ADVERTISER_SALES_INFO, salesInfo);
+            List<AID> customers = search(SystemRole.CUSTOMER);
             receivers.addAll(customers);
         }
 
