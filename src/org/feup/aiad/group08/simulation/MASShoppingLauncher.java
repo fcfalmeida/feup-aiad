@@ -1,9 +1,12 @@
 package org.feup.aiad.group08.simulation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.awt.Color;
 
 import org.feup.aiad.group08.agents.AdvertiserAgent;
 import org.feup.aiad.group08.agents.CustomerAgent;
@@ -19,9 +22,18 @@ import org.feup.aiad.group08.utils.Utils;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
+import sajas.core.Agent;
 import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
+import uchicago.src.sim.engine.Schedule;
+import uchicago.src.sim.gui.DisplaySurface;
+import uchicago.src.sim.gui.Network2DDisplay;
+import uchicago.src.sim.gui.Object2DDisplay;
+import uchicago.src.sim.gui.OvalNetworkItem;
+import uchicago.src.sim.network.DefaultDrawableNode;
+import uchicago.src.sim.space.Object2DGrid;
+
 
 public class MASShoppingLauncher extends Repast3Launcher {
 
@@ -30,6 +42,8 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private ContainerController container;
     private int numCustomers;
     private int numStores;
+
+    private List<DefaultDrawableNode> nodes = new ArrayList<>();
 
     @Override
     public String[] getInitParam() {
@@ -95,6 +109,13 @@ public class MASShoppingLauncher extends Repast3Launcher {
         List<List<String>> storesData = csvreader.getData();
         for (List<String> line : storesData) {
             StoreAgent store = parser.parseLine(line);
+            
+            DefaultDrawableNode node = 
+						generateNode(store.getName(), Color.GREEN,
+								new Random().nextInt(100), new Random().nextInt(100));
+            
+            nodes.add(node);
+
             container.acceptNewAgent(store.getStoreName(), store).start();
         }
 
@@ -116,7 +137,15 @@ public class MASShoppingLauncher extends Repast3Launcher {
         List<List<String>> customersData = csvreader.getData();
         for (List<String> line : customersData) {
             CustomerAgent customer = parser.parseLine(line);
+            
+            DefaultDrawableNode node = 
+						generateNode(customer.getName(), Color.WHITE,
+								new Random().nextInt(100), new Random().nextInt(100));
+            
+            nodes.add(node);
+
             container.acceptNewAgent(customer.getCustomerName(), customer).start();
+
         }
 
         numCustomers = customersData.size();
@@ -129,5 +158,35 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private void createAdvertiser() throws StaleProxyException {
         container.acceptNewAgent("advertiser", new AdvertiserAgent()).start();
     }
+
+    @Override
+    public void begin() {
+        super.begin();
+
+        DisplaySurface dsurf = new DisplaySurface(this, "MAS Shopping");
+        registerDisplaySurface("MAS Shopping", dsurf);
+
+        Network2DDisplay display = new Network2DDisplay(nodes, 100, 100);
+
+        dsurf.addDisplayableProbeable(display, "Agents");
+        dsurf.addZoomable(display);
+        addSimEventListener(dsurf);
+
+        dsurf.display();
+
+        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+    }
+
+    private DefaultDrawableNode generateNode(String label, Color color, int x, int y) {
+        OvalNetworkItem oval = new OvalNetworkItem(x,y);
+        oval.allowResizing(false);
+        oval.setHeight(5);
+        oval.setWidth(5);
+        
+		DefaultDrawableNode node = new DefaultDrawableNode(label, oval);
+		node.setColor(color);
+        
+		return node;
+	}
     
 }
