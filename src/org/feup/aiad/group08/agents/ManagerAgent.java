@@ -121,8 +121,6 @@ public class ManagerAgent extends DFUserAgent {
 
                 if (customers.size() == EXPECTED_CUSTOMERS && 
                     stores.size() == EXPECTED_STORES && advertiser != null && warehouse != null) {
-                        System.out.println(customers.size());
-                        System.out.println(stores.size());
                         allConnected = true;
                     }
             }

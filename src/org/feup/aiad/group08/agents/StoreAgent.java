@@ -14,7 +14,6 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import sajas.proto.AchieveREInitiator;
 import sajas.proto.AchieveREResponder;
-import uchicago.src.sim.network.DefaultDrawableNode;
 
 import org.feup.aiad.group08.behaviours.InformBehaviour;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
@@ -47,8 +46,6 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
     private SalesInfo currentSale;
     private int totalItemsSold;
 
-    private DefaultDrawableNode node;
-
     public StoreAgent(String storeName, StoreType type, int stockCapacity, int initBalance, float minProfitMargin,
             float desiredProfitMargin) {
         this.storeName = storeName;
@@ -68,10 +65,6 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
         addBehaviour(new SendSaleInfo(this));
         addBehaviour(new ReceiveItemPurchaseRequestBehaviour(this));
         addBehaviour(new SendStatusReportBehaviour(this));
-    }
-
-    public void setNode(DefaultDrawableNode node) {
-        this.node = node;
     }
 
     private class SendStatusReportBehaviour extends AchieveREResponder {

@@ -76,21 +76,9 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
         try {
             createWarehouse();
-            // Wait for warehouse to register in the DF
-            Utils.sleep(500);
-    
             createStores();
-            // Wait for stores to register in the DF
-            Utils.sleep(500);
-    
             createCustomers();
-            // Wait for customers to register in the DF
-            Utils.sleep(500);
-    
-            // Wait for advertiser to register in the DF
             createAdvertiser();
-            Utils.sleep(500);
-    
             createManager();
         } catch (StaleProxyException e) {
             e.printStackTrace();
@@ -129,7 +117,6 @@ public class MASShoppingLauncher extends Repast3Launcher {
 								(i + 1) * STORE_NODE_VERTICAL_MARGIN, STORE_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
-            store.setNode(node);
 
             container.acceptNewAgent(store.getStoreName(), store).start();
         }
