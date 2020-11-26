@@ -47,7 +47,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private int numCustomers;
     private int numStores;
 
-    private List<DefaultDrawableNode> nodes = new ArrayList<>();
+    private static List<DefaultDrawableNode> nodes = new ArrayList<>();
 
     @Override
     public String[] getInitParam() {
@@ -58,6 +58,15 @@ public class MASShoppingLauncher extends Repast3Launcher {
     public String getName() {
         return "MAS Shopping";
     }
+
+    public static DefaultDrawableNode getNode(String label) {
+		for(DefaultDrawableNode node : nodes) {
+			if(node.getNodeLabel().equals(label)) {
+				return node;
+			}
+		}
+		return null;
+	}
 
     @Override
     protected void launchJADE() {
@@ -116,10 +125,11 @@ public class MASShoppingLauncher extends Repast3Launcher {
             StoreAgent store = parser.parseLine(line);
             
             DefaultDrawableNode node = 
-						generateStoreNode(store.getStoreName(), Color.GREEN,
+						generateStoreNode(store.getStoreName(), Color.LIGHT_GRAY,
 								(i + 1) * STORE_NODE_VERTICAL_MARGIN, STORE_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
+            store.setNode(node);
 
             container.acceptNewAgent(store.getStoreName(), store).start();
         }
@@ -149,6 +159,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
                         (i + 1) * CUSTOMER_NODE_VERTICAL_MARGIN, HEIGHT - CUSTOMER_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
+            customer.setNode(node);
 
             container.acceptNewAgent(customer.getCustomerName(), customer).start();
 

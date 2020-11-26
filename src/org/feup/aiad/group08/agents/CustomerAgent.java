@@ -14,10 +14,13 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import sajas.proto.AchieveREInitiator;
 import sajas.proto.AchieveREResponder;
+import uchicago.src.sim.network.DefaultDrawableNode;
 
 import org.feup.aiad.group08.definitions.StoreType;
 import org.feup.aiad.group08.definitions.SystemRole;
 import org.feup.aiad.group08.messages.MessageFactory;
+import org.feup.aiad.group08.simulation.Edge;
+import org.feup.aiad.group08.simulation.MASShoppingLauncher;
 import org.feup.aiad.group08.utils.Utils;
 import org.feup.aiad.group08.behaviours.ReceiveInformBehaviour;
 import org.feup.aiad.group08.data.AgentStatus;
@@ -36,6 +39,8 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
 
     private List<SalesInfo> salesInfo = new Vector<>();
 
+    private DefaultDrawableNode node;
+
     public CustomerAgent(String customerName, float initBalance, List<StoreType> storePreferences,
             float influenceability) {
         addSystemRole(SystemRole.CUSTOMER);
@@ -49,6 +54,7 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
     @Override
     protected void setup() {
         super.setup();
+
         addBehaviour(new ReceiveAdvertisementBehaviour(this));
         addBehaviour(new SendStatusReportBehaviour(this));
     }
@@ -67,6 +73,10 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
 
     public float getInfluenceability() {
         return influenceability;
+    }
+
+    public void setNode(DefaultDrawableNode node) {
+        this.node = node;
     }
 
     private class SendStatusReportBehaviour extends AchieveREResponder {
@@ -103,6 +113,9 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
 
         @Override
         public void processMessage(ACLMessage msg) {
+            // Clear all outgoing edges at the start of each iteration
+            node.clearOutEdges();
+
             System.out.println("Customer " + getAgent().getLocalName() + " received sales info from Advertiser");
             try {
                 salesInfo = (Vector<SalesInfo>) msg.getContentObject();
@@ -151,6 +164,11 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
                 happiness = calculateHappiness(receipt.getStoreType(), receipt.getItemPrice(),
                         receipt.getItemDiscount());
                 System.out.println("Customer " + customerName + " happiness: " + happiness);
+
+                DefaultDrawableNode storeNode = MASShoppingLauncher.getNode(inform.getSender().getLocalName());
+
+                Edge edge = new Edge(node, storeNode);
+                node.addOutEdge(edge);
             } catch (UnreadableException e) {
                 e.printStackTrace();
             }
