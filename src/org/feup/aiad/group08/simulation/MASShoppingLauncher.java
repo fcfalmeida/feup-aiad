@@ -1,12 +1,11 @@
 package org.feup.aiad.group08.simulation;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.awt.Color;
 
 import org.feup.aiad.group08.agents.AdvertiserAgent;
 import org.feup.aiad.group08.agents.CustomerAgent;
@@ -22,20 +21,25 @@ import org.feup.aiad.group08.utils.Utils;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
-import sajas.core.Agent;
 import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Network2DDisplay;
-import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.OvalNetworkItem;
+import uchicago.src.sim.gui.RectNetworkItem;
 import uchicago.src.sim.network.DefaultDrawableNode;
-import uchicago.src.sim.space.Object2DGrid;
 
 
 public class MASShoppingLauncher extends Repast3Launcher {
+
+    private static final int WIDTH = 1100;
+    private static final int HEIGHT = 400;
+    private static final int CUSTOMER_NODE_VERTICAL_MARGIN = 50;
+    private static final int STORE_NODE_VERTICAL_MARGIN = 120;
+    private static final int STORE_NODE_HORIZONTAL_MARGIN = 20;
+    private static final int CUSTOMER_NODE_HORIZONTAL_MARGIN = 60;
 
     private Runtime rt;
     private Profile p;
@@ -107,12 +111,13 @@ public class MASShoppingLauncher extends Repast3Launcher {
         }
 
         List<List<String>> storesData = csvreader.getData();
-        for (List<String> line : storesData) {
+        for (int i = 0; i < storesData.size(); i++) {
+            List<String> line = storesData.get(i);
             StoreAgent store = parser.parseLine(line);
             
             DefaultDrawableNode node = 
-						generateNode(store.getName(), Color.GREEN,
-								new Random().nextInt(100), new Random().nextInt(100));
+						generateStoreNode(store.getStoreName(), Color.GREEN,
+								(i + 1) * STORE_NODE_VERTICAL_MARGIN, STORE_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
 
@@ -135,12 +140,13 @@ public class MASShoppingLauncher extends Repast3Launcher {
         }
 
         List<List<String>> customersData = csvreader.getData();
-        for (List<String> line : customersData) {
+        for (int i = 0; i < customersData.size(); i++){
+            List<String> line = customersData.get(i);
             CustomerAgent customer = parser.parseLine(line);
             
             DefaultDrawableNode node = 
-						generateNode(customer.getName(), Color.WHITE,
-								new Random().nextInt(100), new Random().nextInt(100));
+						generateCustomerNode(customer.getCustomerName(), Color.WHITE,
+                        (i + 1) * CUSTOMER_NODE_VERTICAL_MARGIN, HEIGHT - CUSTOMER_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
 
@@ -163,28 +169,44 @@ public class MASShoppingLauncher extends Repast3Launcher {
     public void begin() {
         super.begin();
 
-        DisplaySurface dsurf = new DisplaySurface(this, "MAS Shopping");
-        registerDisplaySurface("MAS Shopping", dsurf);
+        DisplaySurface surface = new DisplaySurface(this, "MAS Shopping");
+        registerDisplaySurface("MAS Shopping", surface);
 
-        Network2DDisplay display = new Network2DDisplay(nodes, 100, 100);
+        Network2DDisplay display = new Network2DDisplay(nodes, WIDTH, HEIGHT);
 
-        dsurf.addDisplayableProbeable(display, "Agents");
-        dsurf.addZoomable(display);
-        addSimEventListener(dsurf);
+        surface.addDisplayableProbeable(display, "Agents");
+        surface.addZoomable(display);
+        addSimEventListener(surface);
 
-        dsurf.display();
+        surface.display();
 
-        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(1, surface, "updateDisplay", Schedule.LAST);
     }
 
-    private DefaultDrawableNode generateNode(String label, Color color, int x, int y) {
+    private DefaultDrawableNode generateCustomerNode(String label, Color color, int x, int y) {
         OvalNetworkItem oval = new OvalNetworkItem(x,y);
         oval.allowResizing(false);
-        oval.setHeight(5);
-        oval.setWidth(5);
+        oval.setHeight(40);
+        oval.setWidth(40);
+
+        oval.setLabelColor(Color.BLACK);
+
+        DefaultDrawableNode node = new DefaultDrawableNode(label, oval);
+        node.setColor(color);
         
-		DefaultDrawableNode node = new DefaultDrawableNode(label, oval);
-		node.setColor(color);
+		return node;
+    }
+    
+    private DefaultDrawableNode generateStoreNode(String label, Color color, int x, int y) {
+        RectNetworkItem rect = new RectNetworkItem(x,y);
+        rect.allowResizing(false);
+        rect.setHeight(40);
+        rect.setWidth(80);
+
+        rect.setLabelColor(Color.BLACK);
+
+        DefaultDrawableNode node = new DefaultDrawableNode(label, rect);
+        node.setColor(color);
         
 		return node;
 	}
