@@ -181,7 +181,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
         DisplaySurface surface = new DisplaySurface(this, "MAS Shopping");
         registerDisplaySurface("MAS Shopping", surface);
 
-        Network2DDisplay display = createGraph(surface);
+        createGraph(surface);
 
         surface.display();
 
