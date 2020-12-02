@@ -25,6 +25,8 @@ import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
 import uchicago.src.sim.analysis.BinDataSource;
 import uchicago.src.sim.analysis.OpenHistogram;
+import uchicago.src.sim.analysis.OpenSequenceGraph;
+import uchicago.src.sim.analysis.Sequence;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Network2DDisplay;
@@ -185,12 +187,15 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
         surface.display();
 
-        OpenHistogram plot = createHappinessHistogram();
+        OpenHistogram happinessHistogram = createHappinessHistogram();
+        happinessHistogram.display();
 
-        plot.display();
+        OpenSequenceGraph averageHappinessGraph = createHappinessOverTimeGraph();
+        averageHappinessGraph.display();
 
         getSchedule().scheduleActionAtInterval(1, surface, "updateDisplay", Schedule.LAST);
-        getSchedule().scheduleActionAtInterval(1, plot, "step", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(100, happinessHistogram, "step", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(100, averageHappinessGraph, "step", Schedule.LAST);
     }
 
     private Network2DDisplay createGraph(DisplaySurface surface) {
@@ -216,6 +221,29 @@ public class MASShoppingLauncher extends Repast3Launcher {
         plot.createHistogramItem("Customer Happiness", customers, source);
 
         return plot;
+    }
+
+    private OpenSequenceGraph createHappinessOverTimeGraph() {
+        OpenSequenceGraph graph = new OpenSequenceGraph("Average Customer Happiness Over Time", this);
+        graph.setXRange(0, 200);
+        graph.setYRange(0, 1);
+        graph.setAxisTitles("Time", "Happiness");
+
+        class AverageHappiness implements Sequence {
+            @Override
+            public double getSValue() {
+                double totalHappiness = 0;
+
+                for (CustomerAgent customer : customers)
+                    totalHappiness += customer.getHappiness();
+
+                return totalHappiness / customers.size();
+            }
+        }
+
+        graph.addSequence("Average Happiness", new AverageHappiness());
+        
+        return graph;
     }
 
     private DefaultDrawableNode generateCustomerNode(String label, Color color, int x, int y) {
