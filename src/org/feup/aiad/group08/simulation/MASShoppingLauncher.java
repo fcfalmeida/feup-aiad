@@ -181,14 +181,29 @@ public class MASShoppingLauncher extends Repast3Launcher {
         DisplaySurface surface = new DisplaySurface(this, "MAS Shopping");
         registerDisplaySurface("MAS Shopping", surface);
 
+        Network2DDisplay display = createGraph(surface);
+
+        surface.display();
+
+        OpenHistogram plot = createHappinessHistogram();
+
+        plot.display();
+
+        getSchedule().scheduleActionAtInterval(1, surface, "updateDisplay", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(1, plot, "step", Schedule.LAST);
+    }
+
+    private Network2DDisplay createGraph(DisplaySurface surface) {
         Network2DDisplay display = new Network2DDisplay(nodes, WIDTH, HEIGHT);
 
         surface.addDisplayableProbeable(display, "Agents");
         surface.addZoomable(display);
         addSimEventListener(surface);
 
-        surface.display();
+        return display;
+    }
 
+    private OpenHistogram createHappinessHistogram() {
         OpenHistogram plot = new OpenHistogram("Customer Happiness", numCustomers, 0);
 
         BinDataSource source = new BinDataSource() {
@@ -200,10 +215,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
         plot.createHistogramItem("Customer Happiness", customers, source);
 
-        plot.display();
-
-        getSchedule().scheduleActionAtInterval(1, surface, "updateDisplay", Schedule.LAST);
-        getSchedule().scheduleActionAtInterval(1, plot, "step", Schedule.LAST);
+        return plot;
     }
 
     private DefaultDrawableNode generateCustomerNode(String label, Color color, int x, int y) {
