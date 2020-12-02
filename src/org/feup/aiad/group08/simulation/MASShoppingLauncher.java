@@ -16,7 +16,6 @@ import org.feup.aiad.group08.csvManager.CSVReader;
 import org.feup.aiad.group08.csvManager.parsers.CustomerParser;
 import org.feup.aiad.group08.csvManager.parsers.StoreParser;
 import org.feup.aiad.group08.definitions.StockPurchaseConditions;
-import org.feup.aiad.group08.utils.Utils;
 
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -156,7 +155,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
     }
     
     private void createManager() throws StaleProxyException {
-        container.acceptNewAgent("manager", new ManagerAgent(5, 3, numStores, numCustomers)).start();
+        container.acceptNewAgent("manager", new ManagerAgent(1, 3, numStores, numCustomers)).start();
     }
 
     private void createAdvertiser() throws StaleProxyException {
