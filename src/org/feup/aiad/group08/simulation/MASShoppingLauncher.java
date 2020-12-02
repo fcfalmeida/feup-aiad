@@ -1,6 +1,7 @@
 package org.feup.aiad.group08.simulation;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +36,17 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
     private static final int WIDTH = 1100;
     private static final int HEIGHT = 400;
+
     private static final int CUSTOMER_NODE_VERTICAL_MARGIN = 50;
     private static final int STORE_NODE_VERTICAL_MARGIN = 120;
     private static final int STORE_NODE_HORIZONTAL_MARGIN = 20;
     private static final int CUSTOMER_NODE_HORIZONTAL_MARGIN = 60;
 
+    private static final Color CUSTOMER_NODE_COLOR = Color.WHITE;
+    private static final Color CUSTOMER_LABEL_COLOR = Color.BLACK;
+    private static final Color STORE_NODE_COLOR = Color.MAGENTA;
+    private static final Color STORE_LABEL_COLOR = Color.BLACK;
+    
     private Runtime rt;
     private Profile p;
     private ContainerController container;
@@ -112,7 +119,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
             StoreAgent store = parser.parseLine(line);
             
             DefaultDrawableNode node = 
-						generateStoreNode(store.getStoreName(), Color.LIGHT_GRAY,
+						generateStoreNode(store.getStoreName(), STORE_NODE_COLOR,
 								(i + 1) * STORE_NODE_VERTICAL_MARGIN, STORE_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
@@ -141,7 +148,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
             CustomerAgent customer = parser.parseLine(line);
             
             DefaultDrawableNode node = 
-						generateCustomerNode(customer.getCustomerName(), Color.WHITE,
+						generateCustomerNode(customer.getCustomerName(), CUSTOMER_NODE_COLOR,
                         (i + 1) * CUSTOMER_NODE_VERTICAL_MARGIN, HEIGHT - CUSTOMER_NODE_HORIZONTAL_MARGIN);
             
             nodes.add(node);
@@ -186,7 +193,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
         oval.setHeight(40);
         oval.setWidth(40);
 
-        oval.setLabelColor(Color.BLACK);
+        oval.setLabelColor(CUSTOMER_LABEL_COLOR);
 
         DefaultDrawableNode node = new DefaultDrawableNode(label, oval);
         node.setColor(color);
@@ -200,7 +207,10 @@ public class MASShoppingLauncher extends Repast3Launcher {
         rect.setHeight(40);
         rect.setWidth(80);
 
-        rect.setLabelColor(Color.BLACK);
+        Font font = new Font("Serif", Font.PLAIN, 14); 
+
+        rect.setFont(font);
+        rect.setLabelColor(STORE_LABEL_COLOR);
 
         DefaultDrawableNode node = new DefaultDrawableNode(label, rect);
         node.setColor(color);
