@@ -1,7 +1,6 @@
 package org.feup.aiad.group08.simulation;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -207,9 +206,6 @@ public class MASShoppingLauncher extends Repast3Launcher {
         rect.setHeight(40);
         rect.setWidth(80);
 
-        Font font = new Font("Serif", Font.PLAIN, 14); 
-
-        rect.setFont(font);
         rect.setLabelColor(STORE_LABEL_COLOR);
 
         DefaultDrawableNode node = new DefaultDrawableNode(label, rect);
