@@ -75,6 +75,10 @@ public class CustomerAgent extends DFUserAgent implements StatusReporter {
         return influenceability;
     }
 
+    public float getHappiness() {
+        return happiness;
+    }
+
     public void setNode(DefaultDrawableNode node) {
         this.node = node;
     }

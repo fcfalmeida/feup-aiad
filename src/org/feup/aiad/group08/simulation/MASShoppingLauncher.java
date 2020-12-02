@@ -23,6 +23,8 @@ import jade.wrapper.StaleProxyException;
 import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
+import uchicago.src.sim.analysis.BinDataSource;
+import uchicago.src.sim.analysis.OpenHistogram;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Network2DDisplay;
@@ -51,6 +53,8 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private ContainerController container;
     private int numCustomers;
     private int numStores;
+
+    private List<CustomerAgent> customers = new ArrayList<>();
 
     private static List<DefaultDrawableNode> nodes = new ArrayList<>();
 
@@ -145,6 +149,8 @@ public class MASShoppingLauncher extends Repast3Launcher {
         for (int i = 0; i < customersData.size(); i++){
             List<String> line = customersData.get(i);
             CustomerAgent customer = parser.parseLine(line);
+
+            customers.add(customer);
             
             DefaultDrawableNode node = 
 						generateCustomerNode(customer.getCustomerName(), CUSTOMER_NODE_COLOR,
@@ -183,7 +189,21 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
         surface.display();
 
+        OpenHistogram plot = new OpenHistogram("Customer Happiness", numCustomers, 0);
+
+        BinDataSource source = new BinDataSource() {
+            public double getBinValue(Object o) {
+                CustomerAgent customer = (CustomerAgent) o;
+                return customer.getHappiness();
+            }
+        };
+
+        plot.createHistogramItem("Customer Happiness", customers, source);
+
+        plot.display();
+
         getSchedule().scheduleActionAtInterval(1, surface, "updateDisplay", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(1, plot, "step", Schedule.LAST);
     }
 
     private DefaultDrawableNode generateCustomerNode(String label, Color color, int x, int y) {
