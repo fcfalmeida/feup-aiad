@@ -103,7 +103,7 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
         public void processMessage(ACLMessage msg) {
             // Add to sales history and reset items sold at the start of each iteration
             salesHistory.add(totalItemsSold);
-            totalItemsSold = 0;
+            // totalItemsSold = 0;
 
             System.out.println(
                     "Store " + getAID().getLocalName() + " received stock purchase authorization from Manager");
@@ -357,6 +357,10 @@ public class StoreAgent extends DFUserAgent implements StatusReporter {
 
     public int getTotalItemsSold() {
         return totalItemsSold;
+    }
+
+    public SalesInfo getCurrentSale() {
+        return currentSale;
     }
 
     @Override

@@ -57,6 +57,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private int numStores;
 
     private List<CustomerAgent> customers = new ArrayList<>();
+    private List<StoreAgent> stores = new ArrayList<>();
 
     private static List<DefaultDrawableNode> nodes = new ArrayList<>();
 
@@ -108,7 +109,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
     private void createStores() throws StaleProxyException {
 
-        String fileToReadName = "./data/input/stores_sumItems6.csv";
+        String fileToReadName = "./data/input/stores_sumItems30.csv";
         String delimiter = ";";
         StoreParser parser = new StoreParser();
         CSVReader csvreader = null;
@@ -122,6 +123,8 @@ public class MASShoppingLauncher extends Repast3Launcher {
         for (int i = 0; i < storesData.size(); i++) {
             List<String> line = storesData.get(i);
             StoreAgent store = parser.parseLine(line);
+
+            stores.add(store);
             
             DefaultDrawableNode node = 
 						generateStoreNode(store.getStoreName(), STORE_NODE_COLOR,
@@ -169,7 +172,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
     }
     
     private void createManager() throws StaleProxyException {
-        container.acceptNewAgent("manager", new ManagerAgent(1, 3, numStores, numCustomers)).start();
+        container.acceptNewAgent("manager", new ManagerAgent(1, 30, numStores, numCustomers)).start();
     }
 
     private void createAdvertiser() throws StaleProxyException {
@@ -193,9 +196,13 @@ public class MASShoppingLauncher extends Repast3Launcher {
         OpenSequenceGraph averageHappinessGraph = createHappinessOverTimeGraph();
         averageHappinessGraph.display();
 
+        OpenSequenceGraph salesGraph = createSalesOverTimeGraph();
+        salesGraph.display();
+
         getSchedule().scheduleActionAtInterval(1, surface, "updateDisplay", Schedule.LAST);
         getSchedule().scheduleActionAtInterval(100, happinessHistogram, "step", Schedule.LAST);
         getSchedule().scheduleActionAtInterval(100, averageHappinessGraph, "step", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(100, salesGraph, "step", Schedule.LAST);
     }
 
     private Network2DDisplay createGraph(DisplaySurface surface) {
@@ -218,7 +225,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
             }
         };
 
-        plot.createHistogramItem("Customer Happiness", customers, source);
+        plot.createHistogramItem("Customers", customers, source);
 
         return plot;
     }
@@ -226,7 +233,7 @@ public class MASShoppingLauncher extends Repast3Launcher {
     private OpenSequenceGraph createHappinessOverTimeGraph() {
         OpenSequenceGraph graph = new OpenSequenceGraph("Average Customer Happiness Over Time", this);
         graph.setXRange(0, 200);
-        graph.setYRange(0, 1);
+        graph.setYRange(0, 2);
         graph.setAxisTitles("Time", "Happiness");
 
         class AverageHappiness implements Sequence {
@@ -243,6 +250,22 @@ public class MASShoppingLauncher extends Repast3Launcher {
 
         graph.addSequence("Average Happiness", new AverageHappiness());
         
+        return graph;
+    }
+
+    private OpenSequenceGraph createSalesOverTimeGraph() {
+        OpenSequenceGraph graph = new OpenSequenceGraph("Store Sales Over Time", this);
+        graph.setAxisTitles("Time", "Units Sold");
+
+        for (StoreAgent store : stores) {
+            graph.addSequence(store.getStoreName(), new Sequence() {
+                @Override
+                public double getSValue() {
+                    return store.getTotalItemsSold();
+                }
+            });
+        }
+
         return graph;
     }
 
